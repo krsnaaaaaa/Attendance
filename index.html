@@ -749,12 +749,22 @@ select.fi2 option{background:#0d1420;}
     <div class="mt" style="color:var(--gold)" id="pay-mo-title">Add Pay Period</div>
     <div class="fgrid" style="margin-bottom:16px">
       <div class="fg"><div class="fl">Period Start</div><input type="date" id="p-from" class="fi2"></div>
-      <div class="fg"><div class="fl">Period End / Pay Date</div><input type="date" id="p-to" class="fi2"></div>
+      <div class="fg">
+        <div class="fl" style="display:flex;align-items:center;justify-content:space-between">
+          Period End / Pay Date
+          <button type="button" id="till-today-btn" onclick="setTillToday()" style="font-size:10px;padding:3px 9px;border-radius:20px;background:rgba(245,200,66,.14);border:1px solid rgba(245,200,66,.3);color:var(--gold);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;transition:all .14s" title="Auto-updates to today every day until you mark as Paid">📅 Till Today</button>
+        </div>
+        <input type="date" id="p-to" class="fi2">
+        <div id="till-today-hint" style="display:none;font-size:11px;color:var(--gold);margin-top:5px;display:flex;align-items:center;gap:5px">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);flex-shrink:0;animation:led-p 2s infinite"></span>
+          Auto-updating to today's date until marked as Paid
+        </div>
+      </div>
     </div>
     <div class="fg" style="margin-bottom:16px"><div class="fl">Salary Amount (Rs.)</div><input type="number" id="p-amt" class="fi2" placeholder="e.g. 25000"></div>
     <div class="fg" style="margin-bottom:16px">
       <div class="fl">Payment Status</div>
-      <select id="p-stat" class="fi2"><option value="pending">Pending</option><option value="paid">Paid</option><option value="overdue">Overdue</option></select>
+      <select id="p-stat" class="fi2" onchange="onPayStatusChange(this.value)"><option value="pending">Pending</option><option value="paid">Paid</option><option value="overdue">Overdue</option></select>
     </div>
     <div class="fg"><div class="fl">Notes (optional)</div><textarea id="p-notes" class="fi2" placeholder="e.g. Monthly salary, bonus..." style="min-height:65px"></textarea></div>
     <div class="ma">
@@ -1484,13 +1494,117 @@ document.addEventListener('keydown',e=>{if(!document.getElementById('pin-ov').cl
 // PAY TRACKER
 // ═══════════════════════════════════════════════
 let editPayIdx=-1;
+let tillTodayActive=false; // tracks if "Till Today" mode is on for the open modal
+
+function setTillToday(){
+  tillTodayActive=true;
+  document.getElementById('p-to').value=today();
+  document.getElementById('p-to').readOnly=true;
+  document.getElementById('p-to').style.opacity='0.6';
+  document.getElementById('till-today-hint').style.display='flex';
+  document.getElementById('till-today-btn').style.background='rgba(245,200,66,.28)';
+  document.getElementById('till-today-btn').style.boxShadow='0 0 10px rgba(245,200,66,.2)';
+  toast('✓ End date will auto-update to today until marked Paid');
+}
+
+function onPayStatusChange(val){
+  // If user marks as Paid, lock off the till-today mode
+  if(val==='paid'&&tillTodayActive){
+    tillTodayActive=false;
+    document.getElementById('p-to').readOnly=false;
+    document.getElementById('p-to').style.opacity='1';
+    document.getElementById('till-today-hint').style.display='none';
+    document.getElementById('till-today-btn').style.background='rgba(245,200,66,.14)';
+    document.getElementById('till-today-btn').style.boxShadow='none';
+    // Lock end date to today when marking paid
+    if(!document.getElementById('p-to').value) document.getElementById('p-to').value=today();
+    toast('Pay period end date locked as today — marked Paid ✓');
+  }
+}
+
+function openPayModal(){
+  editPayIdx=-1;tillTodayActive=false;
+  document.getElementById('pay-mo-title').textContent='Add Pay Period';
+  document.getElementById('p-from').value='';
+  document.getElementById('p-to').value='';
+  document.getElementById('p-to').readOnly=false;
+  document.getElementById('p-to').style.opacity='1';
+  document.getElementById('p-amt').value='';
+  document.getElementById('p-stat').value='pending';
+  document.getElementById('p-notes').value='';
+  document.getElementById('till-today-hint').style.display='none';
+  document.getElementById('till-today-btn').style.background='rgba(245,200,66,.14)';
+  document.getElementById('till-today-btn').style.boxShadow='none';
+  document.getElementById('pay-mo').classList.add('open');
+}
+
+function editPay(idx){
+  const p=payPeriods[idx];editPayIdx=idx;
+  tillTodayActive=p.tillToday&&p.status!=='paid';
+  document.getElementById('pay-mo-title').textContent='Edit Pay Period';
+  document.getElementById('p-from').value=p.from;
+  // If tillToday active, show today's date (auto-updated)
+  document.getElementById('p-to').value=tillTodayActive?today():p.to;
+  document.getElementById('p-to').readOnly=tillTodayActive;
+  document.getElementById('p-to').style.opacity=tillTodayActive?'0.6':'1';
+  document.getElementById('p-amt').value=p.amount||'';
+  document.getElementById('p-stat').value=p.status;
+  document.getElementById('p-notes').value=p.notes||'';
+  if(tillTodayActive){
+    document.getElementById('till-today-hint').style.display='flex';
+    document.getElementById('till-today-btn').style.background='rgba(245,200,66,.28)';
+    document.getElementById('till-today-btn').style.boxShadow='0 0 10px rgba(245,200,66,.2)';
+  } else {
+    document.getElementById('till-today-hint').style.display='none';
+    document.getElementById('till-today-btn').style.background='rgba(245,200,66,.14)';
+    document.getElementById('till-today-btn').style.boxShadow='none';
+  }
+  document.getElementById('pay-mo').classList.add('open');
+}
+
+function savePay(){
+  const from=document.getElementById('p-from').value;
+  const status=document.getElementById('p-stat').value;
+  // If tillToday and not paid, use today as end date
+  const tillToday=tillTodayActive&&status!=='paid';
+  const to=tillToday?today():document.getElementById('p-to').value;
+  if(!from||!to){toast('Set both start and end dates','warn');return;}
+  if(new Date(from)>new Date(to)){toast('Start must be before end date','warn');return;}
+  const rec={
+    from,to,
+    amount:document.getElementById('p-amt').value,
+    status,
+    notes:document.getElementById('p-notes').value,
+    tillToday  // store the flag
+  };
+  if(editPayIdx>=0)payPeriods[editPayIdx]=rec;else payPeriods.push(rec);
+  savePays();closeMo('pay-mo');renderPay();
+  toast(editPayIdx>=0?'✓ Pay period updated':'✓ Pay period added');
+}
+
+function delPay(idx){if(!confirm('Delete this pay period?'))return;payPeriods.splice(idx,1);savePays();renderPay();toast('Deleted');}
+
+// Auto-refresh "till today" periods — runs every time the pay page renders
+// and also on a daily tick so the date updates as days pass
+function refreshTillTodayPeriods(){
+  let changed=false;
+  payPeriods.forEach((p,i)=>{
+    if(p.tillToday&&p.status!=='paid'){
+      const newTo=today();
+      if(p.to!==newTo){payPeriods[i].to=newTo;changed=true;}
+    }
+  });
+  if(changed)savePays();
+}
+
 function getLatestPay(){return payPeriods.length?[...payPeriods].sort((a,b)=>b.from.localeCompare(a.from))[0]:null;}
-function renderPay(){renderPayHero();renderPayDays();renderPayHist();}
+function renderPay(){refreshTillTodayPeriods();renderPayHero();renderPayDays();renderPayHist();}
 function renderPayHero(){
   const p=getLatestPay();
-  if(!p){document.getElementById('pay-hero').innerHTML='<div class="empty"><div class="empty-ic">💸</div><p>No pay periods yet</p></div>';return;}
   const sm={paid:'ppaid',pending:'ppend',overdue:'pover'};const sl={paid:'✓ Paid',pending:'⏳ Pending',overdue:'⚠ Overdue'};
-  document.getElementById('pay-hero').innerHTML=`<div class="pay-hl">Current Pay Period</div><div class="pay-ha">${p.amount?'Rs. '+Number(p.amount).toLocaleString():'—'}</div><div class="pay-hs">${p.notes||p.from+' → '+p.to}</div><span class="pstatus ${sm[p.status]}">${sl[p.status]}</span>`;
+  if(!p){document.getElementById('pay-hero').innerHTML='<div class="empty"><div class="empty-ic">💸</div><p>No pay periods yet</p></div>';return;}
+  const tillBadge=p.tillToday&&p.status!=='paid'?`<span style="font-size:11px;color:var(--gold);display:inline-flex;align-items:center;gap:4px;margin-left:10px"><span style="width:5px;height:5px;border-radius:50%;background:var(--gold);animation:led-p 2s infinite"></span>Auto-updating</span>`:'';
+  document.getElementById('pay-hero').innerHTML=`<div class="pay-hl">Current Pay Period</div><div class="pay-ha" style="display:flex;align-items:baseline;gap:8px">${p.amount?'Rs. '+Number(p.amount).toLocaleString():'—'}${tillBadge}</div><div class="pay-hs">${p.notes||p.from+' → '+p.to}</div><span class="pstatus ${sm[p.status]}">${sl[p.status]}</span>`;
 }
 function renderPayDays(){
   const p=getLatestPay();
@@ -1536,7 +1650,7 @@ function renderPayHist(){
   c.innerHTML=sorted.map((p,i)=>{
     const ri=payPeriods.indexOf(p);
     const pe=entries.filter(e=>e.date>=p.from&&e.date<=p.to);const pres=pe.filter(e=>e.status==='present').length;
-    return`<div class="pay-hr"><div><div class="pay-hn">${p.notes||'Pay Period'}</div><div class="pay-hd">${p.from} → ${p.to} · ${pres} days present</div><div style="margin-top:5px"><span class="pstatus ${sm[p.status]}" style="font-size:10px;padding:2px 9px">${sl[p.status]}</span></div></div><div style="text-align:right"><div class="pay-ha2">${p.amount?'Rs. '+Number(p.amount).toLocaleString():'—'}</div><div style="display:flex;gap:5px;margin-top:7px;justify-content:flex-end"><button class="btn btn-sm" onclick="editPay(${ri})" style="color:rgba(245,200,66,.7);border-color:rgba(245,200,66,.18)">Edit</button><button class="btn btn-sm btn-d" onclick="delPay(${ri})">Del</button></div></div></div>`;
+    return`<div class="pay-hr"><div><div class="pay-hn">${p.notes||'Pay Period'}${p.tillToday&&p.status!=='paid'?` <span style="font-size:9px;color:var(--gold);background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.25);padding:1px 7px;border-radius:20px;font-weight:600">📅 Till Today</span>`:''}</div><div class="pay-hd">${p.from} → ${p.to} · ${pres} days present</div><div style="margin-top:5px"><span class="pstatus ${sm[p.status]}" style="font-size:10px;padding:2px 9px">${sl[p.status]}</span></div></div><div style="text-align:right"><div class="pay-ha2">${p.amount?'Rs. '+Number(p.amount).toLocaleString():'—'}</div><div style="display:flex;gap:5px;margin-top:7px;justify-content:flex-end"><button class="btn btn-sm" onclick="editPay(${ri})" style="color:rgba(245,200,66,.7);border-color:rgba(245,200,66,.18)">Edit</button><button class="btn btn-sm btn-d" onclick="delPay(${ri})">Del</button></div></div></div>`;
   }).join('');
 }
 function openPayModal(){editPayIdx=-1;document.getElementById('pay-mo-title').textContent='Add Pay Period';document.getElementById('p-from').value='';document.getElementById('p-to').value='';document.getElementById('p-amt').value='';document.getElementById('p-stat').value='pending';document.getElementById('p-notes').value='';document.getElementById('pay-mo').classList.add('open');}
@@ -1555,35 +1669,35 @@ function delPay(idx){if(!confirm('Delete this pay period?'))return;payPeriods.sp
 // SEED DATA
 // ═══════════════════════════════════════════════
 function seedIfEmpty(){
-  if(entries.length>0)return;
+  // Clear ALL old data (March entries + old April entries) — fresh start from April 2025
+  const hasOldData = entries.some(e => e.date < '2025-04-01');
+  if(hasOldData){
+    entries = entries.filter(e => e.date >= '2025-04-01');
+    save();
+  }
+  // Only seed April holidays/offdays if truly no April data exists
+  if(entries.some(e => e.date >= '2025-04-01')) return;
   const seed=[
-    {date:'2025-03-15',status:'present',login:'10:00',logout:'15:30',desc:'Crafted E-Voting box and Configured the Electronics Component for the project in Progressive School'},
-    {date:'2025-03-16',status:'present',login:'10:00',logout:'15:30',desc:'Completed E-Voting box and project explanation alongwith started crafting for Weather Station in Progressive school'},
-    {date:'2025-03-17',status:'present',login:'11:00',logout:'15:30',desc:'Completed the crafting and electronics of Weather Station and provided the notes of Weather Station and e-voting project.'},
-    {date:'2025-03-18',status:'present',login:'10:00',logout:'15:30',desc:'Exhibition done in Bal Batika School'},
-    {date:'2025-03-19',status:'present',login:'11:00',logout:'15:30',desc:'Conducted Viva Examination on the School Riviera'},
-    {date:'2025-03-20',status:'present',login:'11:00',logout:'15:30',desc:'Exhibition practice done in Progressive School'},
-    {date:'2025-03-21',status:'holiday',login:'',logout:'',desc:''},
-    {date:'2025-03-22',status:'present',login:'10:00',logout:'15:30',desc:'Exam done in K.V'},
-    {date:'2025-03-23',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-03-24',status:'present',login:'11:00',logout:'15:30',desc:'Exhibition on Progressive School'},
-    {date:'2025-03-25',status:'present',login:'10:00',logout:'15:30',desc:'Exam done in Sypres School'},
-    {date:'2025-03-26',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-03-27',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-03-28',status:'holiday',login:'',logout:'',desc:''},
-    {date:'2025-03-29',status:'present',login:'14:30',logout:'15:30',desc:'Project discussion'},
-    {date:'2025-03-30',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-03-31',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-01',status:'offday',login:'',logout:'',desc:''},{date:'2025-04-02',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-03',status:'offday',login:'',logout:'',desc:''},{date:'2025-04-04',status:'holiday',login:'',logout:'',desc:''},
-    {date:'2025-04-05',status:'offday',login:'',logout:'',desc:''},{date:'2025-04-06',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-07',status:'offday',login:'',logout:'',desc:''},{date:'2025-04-08',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-09',status:'offday',login:'',logout:'',desc:''},{date:'2025-04-10',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-11',status:'holiday',login:'',logout:'',desc:''},{date:'2025-04-12',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-13',status:'offday',login:'',logout:'',desc:''},{date:'2025-04-14',status:'holiday',login:'',logout:'',desc:'Nepali New Year 🎉'},
-    {date:'2025-04-18',status:'holiday',login:'',logout:'',desc:''},{date:'2025-04-25',status:'holiday',login:'',logout:'',desc:''}
+    {date:'2025-04-01',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-02',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-03',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-04',status:'holiday',login:'',logout:'',desc:''},
+    {date:'2025-04-05',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-06',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-07',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-08',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-09',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-10',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-11',status:'holiday',login:'',logout:'',desc:''},
+    {date:'2025-04-12',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-13',status:'offday',login:'',logout:'',desc:''},
+    {date:'2025-04-14',status:'holiday',login:'',logout:'',desc:'Nepali New Year 🎉 (2083 Baisakh 1)'},
+    {date:'2025-04-18',status:'holiday',login:'',logout:'',desc:''},
+    {date:'2025-04-25',status:'holiday',login:'',logout:'',desc:''}
   ];
-  seed.forEach(e=>{e.bsDate=bsStr(e.date);});entries=seed.sort((a,b)=>b.date.localeCompare(a.date));save();
+  seed.forEach(e=>{e.bsDate=bsStr(e.date);});
+  entries=seed.sort((a,b)=>b.date.localeCompare(a.date));
+  save();
 }
 seedIfEmpty();
 

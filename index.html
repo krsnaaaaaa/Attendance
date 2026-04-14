@@ -6,10 +6,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AttendX">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#070b12">
+<meta name="description" content="AttendX — Attendance Management by Rohan Adhikari">
 <title>AttendX — Rohan Adhikari</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23070b12'/><rect x='24' y='24' width='144' height='144' rx='28' fill='url(%23g)'/><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2300e5a0'/><stop offset='1' stop-color='%2300b8ff'/></linearGradient></defs><text x='96' y='122' font-size='80' text-anchor='middle' fill='%23070b12' font-weight='900' font-family='sans-serif'>A</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23070b12'/><text x='16' y='23' font-size='18' text-anchor='middle' fill='%2300e5a0' font-weight='900' font-family='sans-serif'>A</text></svg>">
+<script>if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -312,6 +316,36 @@ select.fi2 option{background:#0d1420;}
 .pk.empty{pointer-events:none;background:transparent;border:none;}
 .pemsg{font-size:12px;color:#ff6b6b;height:15px;margin-bottom:9px;}
 /* PAY TRACKER */
+/* ── PWA INSTALL BANNER ── */
+.pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:500;background:rgba(7,11,18,.97);backdrop-filter:blur(24px);border-top:1px solid rgba(0,229,160,.25);padding:16px 20px 20px;transform:translateY(110%);transition:transform .38s cubic-bezier(.4,0,.2,1);box-shadow:0 -8px 40px rgba(0,0,0,.6);}
+.pwa-banner.show{transform:translateY(0);}
+.pwa-inner{max-width:520px;margin:0 auto;}
+.pwa-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.pwa-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#070b12;box-shadow:0 0 20px var(--ag);}
+.pwa-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.pwa-sub{font-size:12px;color:var(--muted);line-height:1.4;}
+.pwa-btns{display:flex;gap:10px;}
+.pwa-install{flex:1;padding:12px;border-radius:var(--r3);background:linear-gradient(135deg,var(--accent),#00c98d);color:#070b12;font-weight:700;font-size:14px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:0 0 20px var(--ag);transition:all .15s;}
+.pwa-install:hover{opacity:.9;}
+.pwa-dismiss{padding:12px 18px;border-radius:var(--r3);background:var(--glass);border:1px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
+.pwa-dismiss:hover{color:var(--text);}
+.pwa-ios-steps{display:flex;flex-direction:column;gap:9px;margin-bottom:14px;background:var(--glass);border:1px solid var(--border);border-radius:var(--r3);padding:14px;}
+.pwa-step{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted);}
+.pwa-stepn{width:21px;height:21px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#070b12;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.pwa-step strong{color:var(--text);}
+.pwa-features{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.pwa-feat{background:var(--glass);border:1px solid var(--border);border-radius:var(--r3);padding:10px;text-align:center;font-size:11px;color:var(--muted);}
+.pwa-feat-ic{font-size:18px;margin-bottom:4px;}
+/* Notif card */
+.notif-req{background:linear-gradient(135deg,rgba(0,184,255,.08),rgba(0,229,160,.04));border:1px solid rgba(0,184,255,.2);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.notif-enable{padding:9px 16px;border-radius:var(--r3);background:linear-gradient(135deg,var(--accent2),#0096d6);color:white;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;box-shadow:0 0 14px var(--a2g);}
+.notif-enable:disabled{opacity:.5;cursor:default;}
+.ns{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;}
+.ns::before{content:'';width:6px;height:6px;border-radius:50%;}
+.ns-ok{background:var(--pb);color:var(--accent);border:1px solid rgba(0,229,160,.2);}.ns-ok::before{background:var(--accent);}
+.ns-no{background:var(--lb);color:var(--leave);border:1px solid rgba(255,107,107,.2);}.ns-no::before{background:var(--leave);}
+.ns-ask{background:var(--glass2);color:var(--muted);border:1px solid var(--border);}.ns-ask::before{background:var(--muted);}
+@media(max-width:768px){.pwa-btns{flex-direction:column;}.pwa-features{grid-template-columns:repeat(3,1fr);}.notif-req{gap:10px;}.notif-enable{width:100%;margin-top:6px;}}
 .pay-hero{background:linear-gradient(135deg,rgba(245,200,66,.1),rgba(255,170,0,.04));border:1px solid rgba(245,200,66,.18);border-radius:var(--r);padding:24px;margin-bottom:18px;position:relative;overflow:hidden;}
 .pay-hero::before{content:'💰';position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:60px;opacity:.12;}
 .pay-hl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(245,200,66,.68);margin-bottom:7px;}
@@ -612,7 +646,12 @@ select.fi2 option{background:#0d1420;}
       </div>
       <div>
         <div class="card" style="margin-bottom:14px">
-          <div class="ch"><div class="ct">Notifications</div></div>
+          <div class="ch"><div class="ct">Notifications</div><div id="notif-status-pill"></div></div>
+          <div class="notif-req" id="notif-req-card">
+            <div style="font-size:26px">🔔</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Enable Notifications</div><div style="font-size:12px;color:var(--muted)">Get daily 8:30 PM reminders, weekly summaries & smart alerts</div></div>
+            <button class="notif-enable" id="notif-enable-btn" onclick="requestNotifPermission()">Enable</button>
+          </div>
           <div class="togrow"><div class="togi"><h4>8:30 PM Daily Reminder</h4><p>Alert if today's log is missing</p></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
           <div class="togrow"><div class="togi"><h4>Morning Check-in</h4><p>9 AM reminder to log arrival</p></div><button class="tog" onclick="this.classList.toggle('on')"></button></div>
           <div class="togrow"><div class="togi"><h4>Weekly Summary</h4><p>Friday evening digest</p></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
@@ -725,6 +764,33 @@ select.fi2 option{background:#0d1420;}
   </div>
 </div>
 
+<!-- PWA INSTALL BANNER -->
+<div class="pwa-banner" id="pwa-banner">
+  <div class="pwa-inner">
+    <div class="pwa-row">
+      <div class="pwa-icon">A</div>
+      <div style="flex:1">
+        <div class="pwa-title">Install AttendX</div>
+        <div class="pwa-sub">Add to your home screen — instant access, works offline, feels native.</div>
+      </div>
+    </div>
+    <div class="pwa-features">
+      <div class="pwa-feat"><div class="pwa-feat-ic">⚡</div>Instant open</div>
+      <div class="pwa-feat"><div class="pwa-feat-ic">📴</div>Works offline</div>
+      <div class="pwa-feat"><div class="pwa-feat-ic">🔔</div>Notifications</div>
+    </div>
+    <div id="pwa-ios-steps" style="display:none" class="pwa-ios-steps">
+      <div class="pwa-step"><div class="pwa-stepn">1</div><span>Tap the <strong>Share ⎙</strong> button at the bottom of Safari</span></div>
+      <div class="pwa-step"><div class="pwa-stepn">2</div><span>Scroll down → tap <strong>"Add to Home Screen"</strong></span></div>
+      <div class="pwa-step"><div class="pwa-stepn">3</div><span>Tap <strong>Add</strong> — AttendX icon appears on your home screen!</span></div>
+    </div>
+    <div class="pwa-btns" id="pwa-btns">
+      <button class="pwa-install" id="pwa-install-btn" onclick="triggerInstall()">📲 Install App</button>
+      <button class="pwa-dismiss" onclick="dismissPWA()">Not now</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════
 // DATA
@@ -744,7 +810,7 @@ function saveTimer(){localStorage.setItem('ax_timer',JSON.stringify(timerState))
 // BS CALENDAR
 // ═══════════════════════════════════════════════
 const BSM=['Baisakh','Jestha','Ashadh','Shrawan','Bhadra','Ashwin','Kartik','Mangsir','Poush','Magh','Falgun','Chaitra'];
-const BSD={2075:[31,31,32,32,31,30,30,29,30,29,30,30],2076:[31,32,31,32,31,30,30,30,29,29,30,31],2077:[31,31,31,32,31,31,29,30,29,30,29,31],2078:[31,31,32,31,31,31,30,29,30,29,30,30],2079:[31,31,32,32,31,30,30,29,30,29,30,30],2080:[31,32,31,32,31,30,30,30,29,29,30,31],2081:[31,31,31,32,31,31,30,29,30,29,30,30],2082:[31,31,32,31,31,30,30,29,30,29,30,31]};
+const BSD={2075:[31,31,32,32,31,30,30,29,30,29,30,30],2076:[31,32,31,32,31,30,30,30,29,29,30,31],2077:[31,31,31,32,31,31,29,30,29,30,29,31],2078:[31,31,32,31,31,31,30,29,30,29,30,30],2079:[31,31,32,32,31,30,30,29,30,29,30,30],2080:[31,32,31,32,31,30,30,30,29,29,30,31],2081:[31,31,31,32,31,31,30,29,30,29,30,31],2082:[31,32,31,32,31,30,30,30,29,29,30,30],2083:[31,31,31,32,31,31,30,29,30,29,30,30],2084:[31,31,32,31,31,30,30,29,30,29,30,30]};
 const rAD=new Date(2024,3,13),rBS={y:2081,m:1,d:1};
 function toBS(ad){
   const d=new Date(ad);d.setHours(0,0,0,0);
@@ -815,6 +881,7 @@ function go(page,el){
   if(page==='yearview')renderYearView();
   if(page==='goals')renderGoals();
   if(page==='holidays')renderHols();
+  if(page==='settings')updateNotifStatusUI();
 }
 
 // ═══════════════════════════════════════════════
@@ -1202,8 +1269,192 @@ function toggleTheme(){const d=document.documentElement;const dark=d.getAttribut
 // ═══════════════════════════════════════════════
 // NOTIFICATIONS
 // ═══════════════════════════════════════════════
-if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
-setInterval(()=>{const now=new Date();const utc=now.getTime()+now.getTimezoneOffset()*60000;const nepal=new Date(utc+(5*60+45)*60000);if(nepal.getHours()===20&&nepal.getMinutes()>=30&&nepal.getMinutes()<31){const td2=new Date(utc+(5*60+45)*60000).toISOString().slice(0,10);if(!ge(td2)&&Notification.permission==='granted')new Notification('AttendX 🔔',{body:"Today's attendance isn't logged yet!"}); }},60000);
+// ═══════════════════════════════════════════════
+// NOTIFICATIONS — RICH + ACTIONABLE
+// ═══════════════════════════════════════════════
+function requestNotifPermission(){
+  if(!('Notification'in window)){toast('Notifications not supported on this browser','warn');return;}
+  Notification.requestPermission().then(p=>{
+    updateNotifStatusUI();
+    if(p==='granted'){
+      toast('✓ Notifications enabled!');
+      sendTestNotif();
+    } else if(p==='denied'){
+      toast('Notifications blocked. Enable in browser settings.','warn');
+    }
+  });
+}
+
+function updateNotifStatusUI(){
+  const pill=document.getElementById('notif-status-pill');
+  const card=document.getElementById('notif-req-card');
+  const btn=document.getElementById('notif-enable-btn');
+  if(!pill)return;
+  if(!('Notification'in window)){
+    pill.innerHTML='<span class="ns ns-no">Not supported</span>';
+    if(card)card.style.display='none';return;
+  }
+  const p=Notification.permission;
+  if(p==='granted'){
+    pill.innerHTML='<span class="ns ns-ok">✓ Enabled</span>';
+    if(card)card.style.display='none';
+  } else if(p==='denied'){
+    pill.innerHTML='<span class="ns ns-no">Blocked</span>';
+    if(btn){btn.textContent='Blocked';btn.disabled=true;}
+    if(card){card.style.background='rgba(255,107,107,.06)';card.style.borderColor='rgba(255,107,107,.2)';}
+  } else {
+    pill.innerHTML='<span class="ns ns-ask">Not set</span>';
+    if(card)card.style.display='flex';
+  }
+}
+
+function buildNotifPayload(){
+  const td=today();
+  const entry=ge(td);
+  const bs=bsDisp(td);
+  const dayName2=new Date().toLocaleDateString('en-US',{weekday:'long'});
+  const mo=td.slice(0,7);
+  const present=entries.filter(e=>e.date.startsWith(mo)&&e.status==='present').length;
+  const streak=calcStreak();
+  if(entry){
+    const statusEmoji={present:'✅',leave:'🟡',holiday:'🎉',offday:'🌙'};
+    return{
+      title:`AttendX — ${statusEmoji[entry.status]||'📋'} ${cap(entry.status)}`,
+      body:`${dayName2}, ${bs}\nThis month: ${present} days present${streak>1?' · 🔥 '+streak+' day streak':''}`,
+      tag:'attendx-daily',
+      icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="%23070b12"/><text x="96" y="122" font-size="80" text-anchor="middle" fill="%2300e5a0" font-weight="900" font-family="sans-serif">A</text></svg>',
+      badge:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" rx="20" fill="%23070b12"/><text x="48" y="66" font-size="52" text-anchor="middle" fill="%2300e5a0" font-weight="900" font-family="sans-serif">A</text></svg>',
+      data:{url:'./',action:'view'},
+      silent:true
+    };
+  } else {
+    return{
+      title:'AttendX 🔔 — Log your attendance!',
+      body:`${dayName2}, ${bs}\nYou haven\'t logged today yet. Tap to open.${streak>1?' · 🔥 '+streak+' day streak':''}`,
+      tag:'attendx-reminder',
+      icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="%23070b12"/><text x="96" y="122" font-size="80" text-anchor="middle" fill="%23ffb347" font-weight="900" font-family="sans-serif">!</text></svg>',
+      badge:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" rx="20" fill="%23070b12"/><text x="48" y="66" font-size="52" text-anchor="middle" fill="%23ffb347" font-weight="900" font-family="sans-serif">!</text></svg>',
+      data:{url:'./',action:'log'},
+      requireInteraction:true,
+      actions:[
+        {action:'log',title:'📝 Log Now'},
+        {action:'dismiss',title:'Later'}
+      ]
+    };
+  }
+}
+
+function calcStreak(){
+  let s=0;const sr=[...entries].sort((a,b)=>b.date.localeCompare(a.date));
+  for(let i=0;i<sr.length;i++){if(sr[i].status==='present')s++;else break;}
+  return s;
+}
+
+function sendTestNotif(){
+  if(Notification.permission!=='granted')return;
+  const p=buildNotifPayload();
+  // Use service worker notification if available for action buttons
+  if(navigator.serviceWorker&&navigator.serviceWorker.controller){
+    navigator.serviceWorker.ready.then(reg=>{
+      reg.showNotification(p.title,{body:p.body,icon:p.icon,badge:p.badge,tag:p.tag,data:p.data,actions:p.actions||[],requireInteraction:p.requireInteraction||false,silent:p.silent||false});
+    });
+  } else {
+    new Notification(p.title,{body:p.body,icon:p.icon,tag:p.tag});
+  }
+}
+
+function fireRichNotif(){
+  if(Notification.permission!=='granted')return;
+  const p=buildNotifPayload();
+  if(navigator.serviceWorker&&navigator.serviceWorker.controller){
+    navigator.serviceWorker.ready.then(reg=>{
+      reg.showNotification(p.title,{body:p.body,icon:p.icon,badge:p.badge,tag:p.tag,data:p.data,actions:p.actions||[],requireInteraction:p.requireInteraction||false,silent:p.silent||false});
+    });
+  } else {
+    const n=new Notification(p.title,{body:p.body,icon:p.icon,tag:p.tag});
+    n.onclick=()=>{window.focus();if(!ge(today()))openEntryModal();};
+  }
+}
+
+// Check Nepal time (UTC+5:45) every minute
+setInterval(()=>{
+  const now=new Date();
+  const utc=now.getTime()+now.getTimezoneOffset()*60000;
+  const nepal=new Date(utc+(5*60+45)*60000);
+  const h=nepal.getHours(),m=nepal.getMinutes();
+  // 8:30 PM reminder if entry missing
+  if(h===20&&m>=30&&m<31){
+    if(!ge(today()))fireRichNotif();
+  }
+  // Morning check-in at 9:00 AM
+  if(h===9&&m===0){
+    if(!ge(today())&&document.getElementById('morning-toggle')?.classList.contains('on'))fireRichNotif();
+  }
+},60000);
+
+// Listen for messages from service worker (notification action clicks)
+if('serviceWorker'in navigator){
+  navigator.serviceWorker.addEventListener('message',e=>{
+    if(e.data?.action==='log'){window.focus();openEntryModal();}
+    if(e.data?.action==='view'){window.focus();}
+  });
+}
+
+// ═══════════════════════════════════════════════
+// PWA INSTALL BANNER
+// ═══════════════════════════════════════════════
+let deferredInstallPrompt=null;
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+const isInStandalone=window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone===true;
+const pwaDismissed=localStorage.getItem('ax_pwa_dismissed');
+
+function showPWABanner(){
+  if(isInStandalone||pwaDismissed)return;
+  const banner=document.getElementById('pwa-banner');
+  if(isIOS){
+    document.getElementById('pwa-ios-steps').style.display='flex';
+    document.getElementById('pwa-install-btn').style.display='none';
+    banner.classList.add('show');
+  } else if(deferredInstallPrompt){
+    banner.classList.add('show');
+  }
+}
+
+function triggerInstall(){
+  if(!deferredInstallPrompt)return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(r=>{
+    if(r.outcome==='accepted'){
+      toast('✓ AttendX installed! Find it on your home screen.');
+      document.getElementById('pwa-banner').classList.remove('show');
+      localStorage.setItem('ax_pwa_dismissed','1');
+    }
+    deferredInstallPrompt=null;
+  });
+}
+
+function dismissPWA(){
+  document.getElementById('pwa-banner').classList.remove('show');
+  localStorage.setItem('ax_pwa_dismissed','1');
+}
+
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  // Show after 3 seconds so it doesn't feel aggressive
+  setTimeout(showPWABanner,3000);
+});
+
+window.addEventListener('appinstalled',()=>{
+  toast('✓ AttendX installed successfully!');
+  document.getElementById('pwa-banner').classList.remove('show');
+  deferredInstallPrompt=null;
+});
+
+// iOS: show after 5 seconds on first visit
+if(isIOS&&!isInStandalone&&!pwaDismissed){
+  setTimeout(showPWABanner,5000);
+}
 
 // ═══════════════════════════════════════════════
 // TOAST
@@ -1346,6 +1597,15 @@ document.getElementById('s-start').value=settings.start||'09:00';
 document.getElementById('s-end').value=settings.end||'17:00';
 renderDash();
 if(timerState.active)updateTimerUI();
+updateNotifStatusUI();
+
+// Handle shortcuts & deep links (?action=log etc)
+(()=>{
+  const params=new URLSearchParams(window.location.search);
+  const action=params.get('action');
+  if(action==='log'){setTimeout(()=>openEntryModal(),400);}
+  if(action==='dashboard'){/* already default */}
+})();
 </script>
 </body>
 </html>

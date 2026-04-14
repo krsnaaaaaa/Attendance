@@ -131,6 +131,8 @@ nav::-webkit-scrollbar{width:3px;}nav::-webkit-scrollbar-thumb{background:var(--
 .badge-holiday::before{background:var(--holiday);}
 .badge-offday{background:var(--ob);color:var(--offday);border-color:rgba(192,132,252,.22);}
 .badge-offday::before{background:var(--offday);}
+.badge-paid{background:linear-gradient(135deg,rgba(0,229,160,.12),rgba(0,184,255,.08));color:var(--accent);border-color:rgba(0,229,160,.3);}
+.badge-paid::before{background:linear-gradient(135deg,var(--accent),var(--accent2));}
 /* STREAK */
 .streak-banner{background:linear-gradient(135deg,rgba(0,229,160,.08),rgba(0,184,255,.05));border:1px solid rgba(0,229,160,.18);border-radius:var(--r2);padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:18px;animation:sg 3s ease-in-out infinite;}
 @keyframes sg{0%,100%{box-shadow:0 0 0 transparent;}50%{box-shadow:0 0 24px rgba(0,229,160,.07);}}
@@ -214,10 +216,11 @@ nav::-webkit-scrollbar{width:3px;}nav::-webkit-scrollbar-thumb{background:var(--
 .cday:hover{background:var(--glass2);border-color:var(--border);}
 .cday.today{font-weight:700;border-color:rgba(0,229,160,.45)!important;color:var(--accent);}
 .cday.today::after{content:'';position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 5px var(--accent);}
-.cday.present{background:var(--pb);border-color:rgba(0,229,160,.18);}
-.cday.leave{background:var(--lb);border-color:rgba(255,107,107,.18);}
-.cday.holiday{background:var(--hb);border-color:rgba(255,179,71,.18);}
-.cday.offday{background:var(--ob);border-color:rgba(192,132,252,.18);}
+.cday.present{background:var(--pb);border-color:rgba(0,229,160,.65);box-shadow:0 0 0 1px rgba(0,229,160,.25);}
+.cday.leave{background:var(--lb);border-color:rgba(255,107,107,.65);box-shadow:0 0 0 1px rgba(255,107,107,.25);}
+.cday.holiday{background:var(--hb);border-color:rgba(255,179,71,.65);box-shadow:0 0 0 1px rgba(255,179,71,.25);}
+.cday.offday{background:var(--ob);border-color:rgba(192,132,252,.65);box-shadow:0 0 0 1px rgba(192,132,252,.25);}
+.cday.paid{background:linear-gradient(135deg,rgba(0,229,160,.14),rgba(0,184,255,.09));border-color:rgba(0,229,160,.65);box-shadow:0 0 0 1px rgba(0,229,160,.25);}
 .cday.empty{cursor:default;opacity:0;pointer-events:none;}
 .cbs{font-size:8px;color:var(--muted);margin-top:1px;}
 /* CHARTS */
@@ -378,6 +381,27 @@ select.fi2 option{background:#0d1420;}
 .pay-add:hover{background:rgba(245,200,66,.13);color:var(--gold);border-style:solid;}
 /* REPORT CARD */
 .report-grade{font-family:'Syne',sans-serif;font-size:64px;font-weight:800;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+/* PAID STATUS in entry modal */
+.sp2.sppaid{background:linear-gradient(135deg,rgba(0,229,160,.14),rgba(0,184,255,.08));color:var(--accent);border-color:rgba(0,229,160,.2);}
+.sp2.sppaid .spdot{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 6px var(--accent);}
+.sp2.selp2{border-color:var(--accent);box-shadow:0 0 16px rgba(0,229,160,.18),inset 0 0 0 1px rgba(0,229,160,.3);}
+/* PROFILE MODAL */
+.profile-mo-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:350;padding:20px;}
+.profile-mo-overlay.open{display:flex;}
+.profile-mo{background:rgba(10,18,30,.97);border:1px solid var(--border2);border-radius:22px;width:380px;max-width:100%;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6);animation:mi .2s cubic-bezier(.4,0,.2,1);}
+.profile-mo-hero{background:linear-gradient(135deg,rgba(0,229,160,.12),rgba(0,184,255,.07));padding:28px 24px 22px;text-align:center;position:relative;}
+.profile-mo-avatar{width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#070b12;margin:0 auto 14px;box-shadow:0 0 28px var(--ag);}
+.profile-mo-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:3px;}
+.profile-mo-role{font-size:13px;color:var(--muted);}
+.profile-mo-body{padding:20px 24px;}
+.profile-mo-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.profile-mo-row:last-child{border-bottom:none;}
+.profile-mo-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);}
+.profile-mo-val{font-size:14px;font-weight:500;color:var(--text);}
+.profile-mo-footer{padding:0 24px 24px;display:flex;gap:10px;}
+/* Clickable profile card */
+.profile-card{cursor:pointer;}
+.profile-card:hover .pname{color:var(--accent);}
 /* FAB */
 .fab{position:fixed;bottom:28px;right:28px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#00c98d);box-shadow:0 0 24px var(--ag),0 4px 20px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;z-index:90;transition:all .2s;border:none;display:none;}
 .fab:hover{transform:scale(1.08);box-shadow:0 0 34px var(--ag);}
@@ -412,9 +436,13 @@ select.fi2 option{background:#0d1420;}
     <div class="sb-sub">Attendance Management System</div>
   </div>
   <div class="sb-profile">
-    <div class="profile-card">
-      <div class="avatar">RA</div>
-      <div><div class="pname">Rohan Adhikari</div><div class="prole">Administrator</div></div>
+    <div class="profile-card" onclick="openProfileModal()" title="View Profile">
+      <div class="avatar" id="sb-avatar">RA</div>
+      <div>
+        <div class="pname" id="sb-name">Rohan Adhikari</div>
+        <div class="prole" id="sb-role">Administrator</div>
+      </div>
+      <div style="margin-left:auto;font-size:11px;color:var(--muted)">›</div>
     </div>
   </div>
   <nav>
@@ -425,8 +453,6 @@ select.fi2 option{background:#0d1420;}
     <div class="nav-sec">Insights</div>
     <div class="ni" onclick="go('analytics',this)"><div class="niw">📊</div>Analytics</div>
     <div class="ni" onclick="go('report',this)"><div class="niw">📄</div>Monthly Report</div>
-    <div class="ni" onclick="go('yearview',this)"><div class="niw">🗓</div>Year View</div>
-    <div class="ni" onclick="go('goals',this)"><div class="niw">🎯</div>Goals</div>
     <div class="nav-sec">Reference</div>
     <div class="ni" onclick="go('holidays',this)"><div class="niw">🎉</div>Holidays B.S.</div>
     <div class="nav-sec">System</div>
@@ -563,46 +589,9 @@ select.fi2 option{background:#0d1420;}
   </div>
 
   <!-- YEAR VIEW -->
-  <div class="page" id="page-yearview">
-    <div style="display:flex;gap:10px;margin-bottom:18px;align-items:center">
-      <select id="year-sel" class="fi" style="width:120px" onchange="renderYearView()"></select>
-    </div>
-    <div class="card" style="margin-bottom:16px">
-      <div class="ch"><div><div class="ct">Full Year Heatmap</div><div class="cs">GitHub-style attendance view</div></div></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <span class="badge badge-present">Present</span><span class="badge badge-leave">Leave</span>
-        <span class="badge badge-holiday">Holiday</span><span class="badge badge-offday">Off Day</span>
-      </div>
-      <div id="yr-heatmap-wrap" style="overflow-x:auto;padding-bottom:4px"></div>
-    </div>
-    <div class="stats-row" id="yr-stats"></div>
-  </div>
-
-  <!-- GOALS -->
-  <div class="page" id="page-goals">
-    <div class="dash2">
-      <div class="card">
-        <div class="ch"><div><div class="ct">Monthly Attendance Target</div><div class="cs">Set your goal</div></div></div>
-        <div class="fg" style="margin-bottom:14px">
-          <div class="fl">Target Present Days per Month</div>
-          <input type="number" id="goal-target" class="fi2" value="22" min="1" max="31" onchange="saveGoal()">
-        </div>
-        <div id="goal-progress-list"></div>
-      </div>
-      <div class="card">
-        <div class="ch"><div><div class="ct">Pace Tracker</div><div class="cs">This month</div></div></div>
-        <div id="pace-content"></div>
-      </div>
-    </div>
-    <div class="card" style="margin-top:16px">
-      <div class="ch"><div><div class="ct">Last 6 Months vs Target</div><div class="cs">Hit or miss</div></div></div>
-      <div id="goal-history-chart"></div>
-    </div>
-  </div>
-
   <!-- HOLIDAYS -->
   <div class="page" id="page-holidays">
-    <div class="card"><div class="ch"><div><div class="ct">Nepal Public Holidays</div><div class="cs">2081 B.S. / 2024–25 A.D.</div></div></div><div id="hol-list"></div></div>
+    <div class="card"><div class="ch"><div><div class="ct">Nepal Public Holidays</div><div class="cs">2083 B.S. / 2026 A.D. — from Hamro Patro</div></div></div><div id="hol-list"></div></div>
   </div>
 
   <!-- EXPORT -->
@@ -638,6 +627,7 @@ select.fi2 option{background:#0d1420;}
         <div class="ch"><div class="ct">Profile</div></div>
         <div class="fgrid" style="gap:13px">
           <div class="fg"><div class="fl">Full Name</div><input type="text" id="s-name" class="fi2" value="Rohan Adhikari"></div>
+          <div class="fg"><div class="fl">Employee ID</div><input type="text" id="s-empid" class="fi2" placeholder="e.g. EMP-001"></div>
           <div class="fg"><div class="fl">Department</div><input type="text" id="s-dept" class="fi2" value="Administrator"></div>
           <div class="fg"><div class="fl">Work Start</div><input type="time" id="s-start" class="fi2" value="09:00"></div>
           <div class="fg"><div class="fl">Work End</div><input type="time" id="s-end" class="fi2" value="17:00"></div>
@@ -698,9 +688,10 @@ select.fi2 option{background:#0d1420;}
     <div class="fg" style="margin-bottom:16px"><div class="fl">Date</div><input type="date" id="e-date" class="fi2"></div>
     <div class="fg" style="margin-bottom:16px">
       <div class="fl">Status</div>
-      <div class="sgrid">
+      <div class="sgrid" style="grid-template-columns:1fr 1fr 1fr">
         <button class="sp2 spp" onclick="selStatus('present',this)"><span class="spdot"></span>Present</button>
         <button class="sp2 spl" onclick="selStatus('leave',this)"><span class="spdot"></span>Leave</button>
+        <button class="sp2 sppaid" onclick="selStatus('paid',this)"><span class="spdot"></span>Paid</button>
         <button class="sp2 sph" onclick="selStatus('holiday',this)"><span class="spdot"></span>Holiday</button>
         <button class="sp2 spo" onclick="selStatus('offday',this)"><span class="spdot"></span>Off Day</button>
       </div>
@@ -764,12 +755,54 @@ select.fi2 option{background:#0d1420;}
     <div class="fg" style="margin-bottom:16px"><div class="fl">Salary Amount (Rs.)</div><input type="number" id="p-amt" class="fi2" placeholder="e.g. 25000"></div>
     <div class="fg" style="margin-bottom:16px">
       <div class="fl">Payment Status</div>
-      <select id="p-stat" class="fi2" onchange="onPayStatusChange(this.value)"><option value="pending">Pending</option><option value="paid">Paid</option><option value="overdue">Overdue</option></select>
+      <select id="p-stat" class="fi2" onchange="onPayStatusChange(this.value)"><option value="pending">⏳ Pending</option><option value="paid">✓ Paid</option></select>
     </div>
     <div class="fg"><div class="fl">Notes (optional)</div><textarea id="p-notes" class="fi2" placeholder="e.g. Monthly salary, bonus..." style="min-height:65px"></textarea></div>
     <div class="ma">
       <button class="btn" onclick="closeMo('pay-mo')">Cancel</button>
       <button class="btn btn-gold" onclick="savePay()">Save Period</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="profile-mo-overlay" id="profile-mo">
+  <div class="profile-mo">
+    <div class="profile-mo-hero">
+      <button onclick="closeMo('profile-mo')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.08);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center">✕</button>
+      <div class="profile-mo-avatar" id="pmo-avatar">RA</div>
+      <div class="profile-mo-name" id="pmo-name">Rohan Adhikari</div>
+      <div class="profile-mo-role" id="pmo-role">Administrator</div>
+    </div>
+    <div class="profile-mo-body">
+      <div class="profile-mo-row">
+        <div class="profile-mo-lbl">Employee ID</div>
+        <div class="profile-mo-val" id="pmo-empid" style="color:var(--accent)">—</div>
+      </div>
+      <div class="profile-mo-row">
+        <div class="profile-mo-lbl">Department</div>
+        <div class="profile-mo-val" id="pmo-dept">Administrator</div>
+      </div>
+      <div class="profile-mo-row">
+        <div class="profile-mo-lbl">Work Hours</div>
+        <div class="profile-mo-val" id="pmo-hours">09:00 – 17:00</div>
+      </div>
+      <div class="profile-mo-row">
+        <div class="profile-mo-lbl">This Month</div>
+        <div class="profile-mo-val" id="pmo-month">0 days present</div>
+      </div>
+      <div class="profile-mo-row">
+        <div class="profile-mo-lbl">Total Logged</div>
+        <div class="profile-mo-val" id="pmo-total">0 entries</div>
+      </div>
+      <div class="profile-mo-row">
+        <div class="profile-mo-lbl">Current Streak</div>
+        <div class="profile-mo-val" id="pmo-streak">0 days 🔥</div>
+      </div>
+    </div>
+    <div class="profile-mo-footer">
+      <button class="btn btn-p" style="flex:1" onclick="closeMo('profile-mo');go('settings',document.querySelector('.ni:last-child'))">✏️ Edit Profile</button>
+      <button class="btn" onclick="closeMo('profile-mo')">Close</button>
     </div>
   </div>
 </div>
@@ -808,12 +841,10 @@ select.fi2 option{background:#0d1420;}
 let entries = JSON.parse(localStorage.getItem('ax_entries')||'[]');
 let settings = JSON.parse(localStorage.getItem('ax_settings')||'{"name":"Rohan Adhikari","dept":"Administrator","start":"09:00","end":"17:00"}');
 let payPeriods = JSON.parse(localStorage.getItem('ax_pay')||'[]');
-let goalTarget = parseInt(localStorage.getItem('ax_goal')||'22');
 let timerState = JSON.parse(localStorage.getItem('ax_timer')||'{"active":false,"start":null,"loginTime":null}');
 
 function save(){localStorage.setItem('ax_entries',JSON.stringify(entries));}
 function savePays(){localStorage.setItem('ax_pay',JSON.stringify(payPeriods));}
-function saveGoal(){goalTarget=parseInt(document.getElementById('goal-target').value)||22;localStorage.setItem('ax_goal',goalTarget);renderGoals();}
 function saveTimer(){localStorage.setItem('ax_timer',JSON.stringify(timerState));}
 
 // ═══════════════════════════════════════════════
@@ -833,18 +864,53 @@ function bsStr(ad){const b=toBS(ad);return`${b.y}/${String(b.m).padStart(2,'0')}
 function bsDisp(ad){const b=toBS(ad);return`${b.d} ${BSM[b.m-1]} ${b.y}`;}
 
 // ═══════════════════════════════════════════════
-// HOLIDAYS
+// HOLIDAYS — 2083 B.S. (2026 A.D.) — Source: Hamro Patro
 // ═══════════════════════════════════════════════
 const HOLIDAYS=[
-  {bs:'2081/01/01',name:'Nepali New Year',ad:'2024-04-13'},{bs:'2081/01/02',name:'Loktantra Diwas',ad:'2024-04-14'},
-  {bs:'2081/02/15',name:'Buddha Jayanti',ad:'2024-05-23'},{bs:'2081/03/15',name:'Eid al-Adha',ad:'2024-06-17'},
-  {bs:'2081/05/29',name:'Raksha Bandhan',ad:'2024-08-19'},{bs:'2081/05/30',name:'Gai Jatra',ad:'2024-08-20'},
-  {bs:'2081/06/03',name:'Krishna Janmashtami',ad:'2024-08-26'},{bs:'2081/06/17',name:'Haritalika Teej',ad:'2024-09-06'},
-  {bs:'2081/07/03',name:'Ghatasthapana',ad:'2024-09-16'},{bs:'2081/07/12',name:'Maha Navami',ad:'2024-09-25'},
-  {bs:'2081/07/13',name:'Vijaya Dashami',ad:'2024-09-26'},{bs:'2081/08/15',name:'Tihar – Laxmi Puja',ad:'2024-10-31'},
-  {bs:'2081/08/17',name:'Tihar – Bhai Tika',ad:'2024-11-02'},{bs:'2081/11/29',name:'Maha Shivaratri',ad:'2025-02-26'},
-  {bs:'2081/12/07',name:'Fagu Purnima (Holi)',ad:'2025-03-14'},{bs:'2081/12/20',name:'Ghodejatra',ad:'2025-04-02'},
-  {bs:'2082/01/01',name:'Nepali New Year 2082',ad:'2025-04-14'}
+  // Baisakh 2083 (April–May 2026)
+  {bs:'2083/01/01',name:'Nepali New Year — Navabarsha (2083)',ad:'2026-04-14'},
+  {bs:'2083/01/02',name:'Loktantra Diwas (Democracy Day)',ad:'2026-04-15'},
+  // Jestha 2083 (May–June 2026)
+  {bs:'2083/02/08',name:'Buddha Purnima (Buddha Jayanti)',ad:'2026-05-27'},
+  // Ashadh 2083 (June–July 2026)
+  {bs:'2083/03/01',name:'Eid al-Adha (Bakra Eid) — approx.',ad:'2026-06-17'},
+  // Shrawan 2083 (July–Aug 2026)
+  {bs:'2083/04/17',name:'Janai Purnima (Raksha Bandhan)',ad:'2026-08-02'},
+  {bs:'2083/04/18',name:'Gai Jatra',ad:'2026-08-03'},
+  // Bhadra 2083 (Aug–Sep 2026)
+  {bs:'2083/05/03',name:'Krishna Janmashtami',ad:'2026-08-19'},
+  {bs:'2083/05/17',name:'Haritalika Teej',ad:'2026-09-01'},
+  {bs:'2083/05/18',name:'Rishi Panchami',ad:'2026-09-02'},
+  // Ashwin 2083 (Sep–Oct 2026)
+  {bs:'2083/06/03',name:'Ghatasthapana (Dashain Begins)',ad:'2026-09-19'},
+  {bs:'2083/06/07',name:'Fulpati',ad:'2026-09-23'},
+  {bs:'2083/06/08',name:'Maha Ashtami',ad:'2026-09-24'},
+  {bs:'2083/06/09',name:'Maha Navami',ad:'2026-09-25'},
+  {bs:'2083/06/10',name:'Vijaya Dashami (Dashain)',ad:'2026-09-26'},
+  {bs:'2083/06/11',name:'Ekadashi (Dashain)',ad:'2026-09-27'},
+  {bs:'2083/06/12',name:'Dwadashi (Dashain)',ad:'2026-09-28'},
+  // Kartik 2083 (Oct–Nov 2026)
+  {bs:'2083/07/01',name:'Kojagrat Purnima',ad:'2026-10-17'},
+  {bs:'2083/07/13',name:'Dhanteras — Tihar Begins',ad:'2026-10-29'},
+  {bs:'2083/07/14',name:'Kali Puja / Naraka Chaturdashi',ad:'2026-10-30'},
+  {bs:'2083/07/15',name:'Laxmi Puja (Tihar)',ad:'2026-10-31'},
+  {bs:'2083/07/16',name:'Gobardhan Puja / Mha Puja',ad:'2026-11-01'},
+  {bs:'2083/07/17',name:'Bhai Tika (Tihar Ends)',ad:'2026-11-02'},
+  // Mangsir 2083 (Nov–Dec 2026)
+  {bs:'2083/08/01',name:'Chhath Parwa — Saptami',ad:'2026-11-16'},
+  // Poush 2083 (Dec 2026–Jan 2027)
+  {bs:'2083/09/29',name:'Tamu Lhosar',ad:'2027-01-13'},
+  // Magh 2083 (Jan–Feb 2027)
+  {bs:'2083/10/01',name:'Maghe Sankranti / Makar Sankranti',ad:'2027-01-14'},
+  {bs:'2083/10/29',name:'Sonam Lhosar',ad:'2027-02-11'},
+  // Falgun 2083 (Feb–Mar 2027)
+  {bs:'2083/11/14',name:'Maha Shivaratri',ad:'2027-02-26'},
+  {bs:'2083/11/29',name:'Gyalpo Lhosar',ad:'2027-03-13'},
+  // Chaitra 2083 (Mar–Apr 2027)
+  {bs:'2083/12/07',name:'Holi — Phagu Purnima (Hills)',ad:'2027-03-21'},
+  {bs:'2083/12/08',name:'Holi — Phagu Purnima (Terai)',ad:'2027-03-22'},
+  {bs:'2083/12/20',name:'Ghode Jatra',ad:'2027-04-03'},
+  {bs:'2083/12/30',name:'Ram Nawami',ad:'2027-04-13'},
 ];
 
 // ═══════════════════════════════════════════════
@@ -867,9 +933,7 @@ const PAGE_META={
   calendar:{t:'Calendar',s:'Monthly view with B.S. dates'},
   analytics:{t:'Analytics',s:'Charts & trends'},
   report:{t:'Monthly Report',s:'Auto-generated report card'},
-  yearview:{t:'Year View',s:'Full year heatmap'},
-  goals:{t:'Goals & Targets',s:'Track your attendance goals'},
-  holidays:{t:'Holidays B.S.',s:'Nepal 2081 B.S. public holidays'},
+  holidays:{t:'Holidays B.S.',s:'Nepal 2083 B.S. public holidays'},
   export:{t:'Export',s:'Download data & install app'},
   settings:{t:'Settings',s:'Profile & preferences'},
   salary:{t:'Pay Tracker',s:'Salary periods & payment history'}
@@ -888,8 +952,6 @@ function go(page,el){
   if(page==='calendar')renderCal();
   if(page==='analytics')renderAnalytics();
   if(page==='report')renderReport();
-  if(page==='yearview')renderYearView();
-  if(page==='goals')renderGoals();
   if(page==='holidays')renderHols();
   if(page==='settings')updateNotifStatusUI();
 }
@@ -898,7 +960,7 @@ function go(page,el){
 // MODAL HELPERS
 // ═══════════════════════════════════════════════
 function closeMo(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+document.querySelectorAll('.mo,.profile-mo-overlay').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
 
 // ═══════════════════════════════════════════════
 // ENTRY MODAL + SUGGESTIONS
@@ -911,34 +973,67 @@ function openEntryModal(ds){
   document.getElementById('e-out').value=ex?(ex.logout||settings.end||'17:00'):settings.end||'17:00';
   document.getElementById('e-desc').value=ex?(ex.desc||''):'';
   document.getElementById('emo-title').textContent=ex?'Edit Entry':'Log Attendance';
-  document.querySelectorAll('.sp2').forEach(b=>b.className=b.className.replace(/sel[pho]/g,'').trim());
-  if(ex){const m={present:'selp',leave:'sell',holiday:'selh',offday:'selo'};const btn=document.querySelector('.sp2.sp'+ex.status.charAt(0));if(btn)btn.classList.add(m[ex.status]);}
-  document.getElementById('time-sec').style.display=(ex&&ex.status==='present')||(!ex)?'grid':'none';
+  document.querySelectorAll('.sp2').forEach(b=>b.className=b.className.replace(/sel\w*/g,'').trim());
+  if(ex){
+    const selMap={present:'selp',leave:'sell',holiday:'selh',offday:'selo',paid:'selp2'};
+    const clsMap={present:'spp',leave:'spl',holiday:'sph',offday:'spo',paid:'sppaid'};
+    const btn=document.querySelector('.sp2.'+clsMap[ex.status]);
+    if(btn)btn.classList.add(selMap[ex.status]||'selp');
+    document.getElementById('time-sec').style.display=(ex.status==='present'||ex.status==='paid')?'grid':'none';
+  } else {
+    document.getElementById('time-sec').style.display='grid';
+  }
   document.getElementById('entry-mo').classList.add('open');
 }
 function selStatus(s,btn){
   document.getElementById('e-status').value=s;
-  document.querySelectorAll('.sp2').forEach(b=>b.className=b.className.replace(/sel[pho]/g,'').trim());
-  const m={present:'selp',leave:'sell',holiday:'selh',offday:'selo'};btn.classList.add(m[s]);
-  document.getElementById('time-sec').style.display=s==='present'?'grid':'none';
+  document.querySelectorAll('.sp2').forEach(b=>b.className=b.className.replace(/sel\w*/g,'').trim());
+  const selMap={present:'selp',leave:'sell',holiday:'selh',offday:'selo',paid:'selp2'};
+  btn.classList.add(selMap[s]||'selp');
+  // show time only for present and paid
+  document.getElementById('time-sec').style.display=(s==='present'||s==='paid')?'grid':'none';
 }
 function saveEntry(){
   const date=document.getElementById('e-date').value;
   const status=document.getElementById('e-status').value;
   if(!status){toast('Please select a status','warn');return;}
-  const login=status==='present'?document.getElementById('e-in').value:'';
-  const logout=status==='present'?document.getElementById('e-out').value:'';
+  const isPaidOrPresent=status==='present'||status==='paid';
+  const login=isPaidOrPresent?document.getElementById('e-in').value:'';
+  const logout=isPaidOrPresent?document.getElementById('e-out').value:'';
   const desc=document.getElementById('e-desc').value.trim();
   const idx=entries.findIndex(e=>e.date===date);
   const entry={date,status,login,logout,desc,bsDate:bsStr(date)};
   if(idx>=0)entries[idx]=entry;else entries.push(entry);
   entries.sort((a,b)=>b.date.localeCompare(a.date));
-  // save to desc history
   if(desc){const dh=JSON.parse(localStorage.getItem('ax_descs')||'[]');if(!dh.includes(desc)){dh.unshift(desc);if(dh.length>50)dh.pop();localStorage.setItem('ax_descs',JSON.stringify(dh));}}
-  save();closeMo('entry-mo');renderDash();
-  // auto-fill time if timer was running
-  if(timerState.loginTime&&status==='present'){timerState={active:false,start:null,loginTime:null};saveTimer();updateTimerUI();}
-  toast('✓ Entry saved');
+  save();
+
+  // PAID status logic:
+  // 1. Find the active pending till-today pay period and mark it paid up to this date
+  // 2. Auto-create a new pending till-today period starting the next day
+  if(status==='paid'){
+    const pendingIdx=payPeriods.findIndex(p=>p.tillToday&&p.status!=='paid');
+    if(pendingIdx>=0){
+      // Mark existing period as paid, lock end date to this entry's date
+      payPeriods[pendingIdx].status='paid';
+      payPeriods[pendingIdx].to=date;
+      payPeriods[pendingIdx].tillToday=false;
+      // Start new pending period from next day with till-today flag
+      const nextDay=new Date(date+'T12:00:00');nextDay.setDate(nextDay.getDate()+1);
+      const nextDayStr=nextDay.toISOString().slice(0,10);
+      payPeriods.push({from:nextDayStr,to:nextDayStr,amount:payPeriods[pendingIdx].amount,status:'pending',notes:'',tillToday:true});
+      savePays();
+      toast('✓ Paid! New period started from '+nextDayStr+' 🔄');
+    } else {
+      // No active period — just save the entry
+      toast('✓ Entry saved as Paid');
+    }
+  } else {
+    toast('✓ Entry saved');
+  }
+
+  closeMo('entry-mo');renderDash();
+  if(timerState.loginTime&&(status==='present'||status==='paid')){timerState={active:false,start:null,loginTime:null};saveTimer();updateTimerUI();}
 }
 function deleteEntry(d){
   if(!confirm(`Delete entry for ${d}?`))return;
@@ -1025,13 +1120,20 @@ function updateTodaySub(){
 }
 function checkBanner(){const d=new Date().getDay();document.getElementById('miss-banner').classList.toggle('show',!ge(today())&&d!==0&&d!==6);}
 function renderStats(id){
-  const tot=entries.length,p=entries.filter(e=>e.status==='present').length,l=entries.filter(e=>e.status==='leave').length,h=entries.filter(e=>e.status==='holiday').length,o=entries.filter(e=>e.status==='offday').length;
-  const tH=entries.filter(e=>e.status==='present').reduce((s,e)=>s+ch(e.login,e.logout),0);
+  const tot=entries.length;
+  const p=entries.filter(e=>e.status==='present').length;
+  const pd=entries.filter(e=>e.status==='paid').length;
+  const l=entries.filter(e=>e.status==='leave').length;
+  const h=entries.filter(e=>e.status==='holiday').length;
+  const o=entries.filter(e=>e.status==='offday').length;
+  const worked=entries.filter(e=>e.status==='present'||e.status==='paid');
+  const tH=worked.reduce((s,e)=>s+ch(e.login,e.logout),0);
   const std=ch(settings.start,settings.end)||8;
-  const otH=entries.filter(e=>e.status==='present').reduce((s,e)=>{const hh=ch(e.login,e.logout);return s+(hh>std+.5?hh-std:0);},0);
+  const otH=worked.reduce((s,e)=>{const hh=ch(e.login,e.logout);return s+(hh>std+.5?hh-std:0);},0);
   document.getElementById(id).innerHTML=`
     <div class="sc"><div class="sic" style="background:var(--glass2)">📁</div><div class="sl2">Total</div><div class="sv" style="color:var(--text)">${tot}</div><div class="sh2">days logged</div></div>
     <div class="sc sp"><div class="sic">✓</div><div class="sl2">Present</div><div class="sv">${p}</div><div class="sh2">${tot?Math.round(p/tot*100):0}% rate</div></div>
+    <div class="sc sp" style="--cg:linear-gradient(135deg,rgba(0,184,255,.06),transparent);--cb:rgba(0,184,255,.3)"><div class="sic" style="background:rgba(0,184,255,.12)">💰</div><div class="sl2">Paid Days</div><div class="sv" style="color:var(--accent2)">${pd}</div><div class="sh2">salary paid</div></div>
     <div class="sc sl"><div class="sic">!</div><div class="sl2">Leave</div><div class="sv">${l}</div><div class="sh2">days</div></div>
     <div class="sc sh"><div class="sic">🎉</div><div class="sl2">Holidays</div><div class="sv">${h}</div><div class="sh2">public</div></div>
     <div class="sc so"><div class="sic">🌙</div><div class="sl2">Off Days</div><div class="sv">${o}</div><div class="sh2">weekly</div></div>
@@ -1044,14 +1146,17 @@ function renderStreak(){
 }
 function renderGoalRing(){
   const mo=today().slice(0,7);
+  const dim=new Date(parseInt(mo.split('-')[0]),parseInt(mo.split('-')[1]),0).getDate();
   const p=entries.filter(e=>e.date.startsWith(mo)&&e.status==='present').length;
-  const pct=Math.min(Math.round(p/goalTarget*100),100);
+  const hols=entries.filter(e=>e.date.startsWith(mo)&&(e.status==='holiday'||e.status==='offday')).length;
+  const workDays=Math.max(dim-hols,1);
+  const pct=Math.min(Math.round(p/workDays*100),100);
   const circ=238.76,offset=circ-(pct/100)*circ;
   const el=document.getElementById('goal-circle');if(el)el.style.strokeDashoffset=offset;
   const pg=document.getElementById('goal-pct');if(pg)pg.textContent=pct+'%';
-  const dg=document.getElementById('goal-days');if(dg)dg.textContent=`${p}/${goalTarget}`;
+  const dg=document.getElementById('goal-days');if(dg)dg.textContent=`${p}/${workDays}`;
   const hint=document.getElementById('goal-hint');
-  if(hint){const rem=goalTarget-p;hint.textContent=rem>0?`${rem} more to reach goal`:'Goal achieved! 🎉';}
+  if(hint)hint.textContent=`${new Date().toLocaleDateString('en-US',{month:'long'})} attendance`;
 }
 function renderRecent(){
   const rec=entries.slice(0,7),tb=document.getElementById('rec-tbody');const std=ch(settings.start,settings.end)||8;
@@ -1179,7 +1284,7 @@ function renderReport(){
         <div>⚠️ Late days: <strong style="color:var(--leave)">${lateCount}</strong></div>
         <div>⏱ Total hours: <strong style="color:var(--accent2)">${tH.toFixed(1)}h</strong></div>
         <div>📊 Avg/day: <strong style="color:var(--text)">${p?((tH/p).toFixed(1))+'h':'—'}</strong></div>
-        <div>🎯 Target: <strong style="color:var(--text)">${rate>=goalTarget/daysInMonth*100*expWork/expWork?'Met ✓':'Not met'}</strong></div>
+        <div>🎯 Attendance rate: <strong style="color:${rate>=80?'var(--accent)':'var(--leave)'};">${rate>=80?'Good ✓':'Needs improvement'}</strong></div>
       </div>
     </div>
   </div>`;
@@ -1192,53 +1297,6 @@ function renderReport(){
     <div class="sc so"><div class="sic">🌙</div><div class="sl2">Off Days</div><div class="sv">${o2}</div></div>`;
 }
 function exportReport(){window.print();}
-
-// ═══════════════════════════════════════════════
-// YEAR VIEW
-// ═══════════════════════════════════════════════
-function renderYearView(){
-  const sel=document.getElementById('year-sel');
-  if(!sel.innerHTML){const cy=new Date().getFullYear();for(let y=cy;y>=cy-3;y--){const o=document.createElement('option');o.value=y;o.textContent=y;sel.appendChild(o);}}
-  const yr=parseInt(sel.value)||new Date().getFullYear();
-  const start=new Date(yr,0,1);const cells=[];
-  const firstDay=start.getDay();
-  for(let i=0;i<firstDay;i++)cells.push(null);
-  for(let d=0;d<365;d++){const date=new Date(yr,0,1+d);if(date.getFullYear()!==yr)break;const ds=date.toISOString().slice(0,10);const en=ge(ds);cells.push(en?en.status:'empty');}
-  const weeks=[];for(let i=0;i<cells.length;i+=7)weeks.push(cells.slice(i,i+7));
-  document.getElementById('yr-heatmap-wrap').innerHTML=`<div style="display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);gap:2px;width:max-content">${cells.map(s=>`<div class="yr-cell ${s&&s!=='empty'?s:''}" style="${!s?'opacity:0':''}" title="${s||''}"></div>`).join('')}</div>`;
-  const pe=entries.filter(e=>e.date.startsWith(yr));const pp=pe.filter(e=>e.status==='present').length,ll=pe.filter(e=>e.status==='leave').length,hh=pe.filter(e=>e.status==='holiday').length,oo=pe.filter(e=>e.status==='offday').length;
-  document.getElementById('yr-stats').innerHTML=`
-    <div class="sc sp"><div class="sic">✓</div><div class="sl2">Present</div><div class="sv">${pp}</div><div class="sh2">${yr}</div></div>
-    <div class="sc sl"><div class="sic">!</div><div class="sl2">Leave</div><div class="sv">${ll}</div><div class="sh2">${yr}</div></div>
-    <div class="sc sh"><div class="sic">🎉</div><div class="sl2">Holidays</div><div class="sv">${hh}</div><div class="sh2">${yr}</div></div>
-    <div class="sc so"><div class="sic">🌙</div><div class="sl2">Off Days</div><div class="sv">${oo}</div><div class="sh2">${yr}</div></div>`;
-}
-
-// ═══════════════════════════════════════════════
-// GOALS
-// ═══════════════════════════════════════════════
-function renderGoals(){
-  document.getElementById('goal-target').value=goalTarget;
-  const m6=last6();
-  document.getElementById('goal-progress-list').innerHTML=m6.map(m=>{
-    const p=entries.filter(e=>e.date.startsWith(m.k)&&e.status==='present').length;
-    const pct=Math.min(Math.round(p/goalTarget*100),100);const met=p>=goalTarget;
-    return`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">${m.l}</span><span style="color:${met?'var(--accent)':'var(--leave)'}">${p}/${goalTarget} ${met?'✓ Met':'✗ Missed'}</span></div><div style="height:6px;background:var(--glass2);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${met?'var(--accent)':'var(--leave)'};border-radius:3px;transition:width .6s"></div></div></div>`;
-  }).join('');
-  const mo=today().slice(0,7);const dim=new Date(parseInt(mo.split('-')[0]),parseInt(mo.split('-')[1]),0).getDate();const curDay=new Date().getDate();
-  const p=entries.filter(e=>e.date.startsWith(mo)&&e.status==='present').length;
-  const pace=Math.round(goalTarget/dim*curDay);const ahead=p-pace;
-  document.getElementById('pace-content').innerHTML=`
-    <div style="text-align:center;padding:16px 0">
-      <div style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:${ahead>=0?'var(--accent)':'var(--leave)'};margin-bottom:6px">${ahead>=0?'+'+ahead:ahead}</div>
-      <div style="font-size:13px;color:var(--muted)">${ahead>=0?'days ahead of pace':'days behind pace'}</div>
-      <div style="margin-top:14px;font-size:12px;color:var(--muted)">Expected by today: <strong style="color:var(--text)">${pace}</strong></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:3px">Actual: <strong style="color:var(--accent)">${p}</strong></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:8px">Need ${Math.max(goalTarget-p,0)} more days to hit goal this month</div>
-    </div>`;
-  const maxV=Math.max(...m6.map(m=>{const p2=entries.filter(e=>e.date.startsWith(m.k)&&e.status==='present').length;return p2;}),goalTarget);
-  document.getElementById('goal-history-chart').innerHTML=`<div class="cbars">${m6.map(m=>{const p2=entries.filter(e=>e.date.startsWith(m.k)&&e.status==='present').length;const met2=p2>=goalTarget;return`<div class="cbc"><div class="cbar" data-v="${p2} days" style="height:${Math.round(p2/maxV*100)}%;background:${met2?'linear-gradient(180deg,var(--accent),rgba(0,229,160,.38))':'linear-gradient(180deg,var(--leave),rgba(255,107,107,.38))'}"></div><span class="cbl">${m.l}</span></div>`;}).join('')}<div class="cbc" style="position:absolute;left:0;right:0;bottom:${Math.round(goalTarget/maxV*100)}%;height:1px;background:rgba(245,200,66,.4);pointer-events:none"><span style="font-size:9px;color:var(--gold);position:absolute;right:0;bottom:2px">target</span></div></div>`;
-}
 
 // ═══════════════════════════════════════════════
 // HOLIDAYS
@@ -1264,11 +1322,43 @@ function dl(n,c,t){const a=document.createElement('a');a.href=URL.createObjectUR
 // SETTINGS
 // ═══════════════════════════════════════════════
 function saveSettings(){
-  settings.name=document.getElementById('s-name').value;settings.dept=document.getElementById('s-dept').value;
-  settings.start=document.getElementById('s-start').value;settings.end=document.getElementById('s-end').value;
-  localStorage.setItem('ax_settings',JSON.stringify(settings));toast('✓ Saved');
+  settings.name=document.getElementById('s-name').value;
+  settings.dept=document.getElementById('s-dept').value;
+  settings.empid=document.getElementById('s-empid').value;
+  settings.start=document.getElementById('s-start').value;
+  settings.end=document.getElementById('s-end').value;
+  localStorage.setItem('ax_settings',JSON.stringify(settings));
+  // Update sidebar profile card
+  const initials=settings.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const sbA=document.getElementById('sb-avatar');if(sbA)sbA.textContent=initials;
+  const sbN=document.getElementById('sb-name');if(sbN)sbN.textContent=settings.name;
+  const sbR=document.getElementById('sb-role');if(sbR)sbR.textContent=settings.dept;
+  const pmoA=document.getElementById('pmo-avatar');if(pmoA)pmoA.textContent=initials;
+  toast('✓ Profile saved');
 }
 function clearAll(){if(!confirm('Delete ALL data? Cannot be undone!'))return;entries=[];save();renderDash();toast('Cleared');}
+
+// ═══════════════════════════════════════════════
+// PROFILE MODAL
+// ═══════════════════════════════════════════════
+function openProfileModal(){
+  const n=settings.name||'Rohan Adhikari';
+  const initials=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('pmo-avatar').textContent=initials;
+  document.getElementById('pmo-name').textContent=n;
+  document.getElementById('pmo-role').textContent=settings.dept||'Administrator';
+  document.getElementById('pmo-empid').textContent=settings.empid||'—';
+  document.getElementById('pmo-dept').textContent=settings.dept||'Administrator';
+  document.getElementById('pmo-hours').textContent=`${settings.start||'09:00'} – ${settings.end||'17:00'}`;
+  const mo=today().slice(0,7);
+  const mp=entries.filter(e=>e.date.startsWith(mo)&&(e.status==='present'||e.status==='paid')).length;
+  document.getElementById('pmo-month').textContent=`${mp} day${mp!==1?'s':''} worked`;
+  document.getElementById('pmo-total').textContent=`${entries.length} entr${entries.length!==1?'ies':'y'}`;
+  let streak=0;const sr=[...entries].sort((a,b)=>b.date.localeCompare(a.date));
+  for(let i=0;i<sr.length;i++){if(sr[i].status==='present'||sr[i].status==='paid')streak++;else break;}
+  document.getElementById('pmo-streak').textContent=`${streak} day${streak!==1?'s':''} ${streak>0?'🔥':''}`;
+  document.getElementById('profile-mo').classList.add('open');
+}
 
 // ═══════════════════════════════════════════════
 // THEME
@@ -1601,7 +1691,7 @@ function getLatestPay(){return payPeriods.length?[...payPeriods].sort((a,b)=>b.f
 function renderPay(){refreshTillTodayPeriods();renderPayHero();renderPayDays();renderPayHist();}
 function renderPayHero(){
   const p=getLatestPay();
-  const sm={paid:'ppaid',pending:'ppend',overdue:'pover'};const sl={paid:'✓ Paid',pending:'⏳ Pending',overdue:'⚠ Overdue'};
+  const sm={paid:'ppaid',pending:'ppend'};const sl={paid:'✓ Paid',pending:'⏳ Pending'};
   if(!p){document.getElementById('pay-hero').innerHTML='<div class="empty"><div class="empty-ic">💸</div><p>No pay periods yet</p></div>';return;}
   const tillBadge=p.tillToday&&p.status!=='paid'?`<span style="font-size:11px;color:var(--gold);display:inline-flex;align-items:center;gap:4px;margin-left:10px"><span style="width:5px;height:5px;border-radius:50%;background:var(--gold);animation:led-p 2s infinite"></span>Auto-updating</span>`:'';
   document.getElementById('pay-hero').innerHTML=`<div class="pay-hl">Current Pay Period</div><div class="pay-ha" style="display:flex;align-items:baseline;gap:8px">${p.amount?'Rs. '+Number(p.amount).toLocaleString():'—'}${tillBadge}</div><div class="pay-hs">${p.notes||p.from+' → '+p.to}</div><span class="pstatus ${sm[p.status]}">${sl[p.status]}</span>`;
@@ -1610,33 +1700,32 @@ function renderPayDays(){
   const p=getLatestPay();
   if(!p){document.getElementById('pay-daystats').innerHTML='';document.getElementById('pay-proginfo').innerHTML='';return;}
   const pe=entries.filter(e=>e.date>=p.from&&e.date<=p.to);
-  const pres=pe.filter(e=>e.status==='present').length;
-  const leav=pe.filter(e=>e.status==='leave').length;
-  const hol=pe.filter(e=>e.status==='holiday').length;
-  const tH=pe.filter(e=>e.status==='present').reduce((s,e)=>s+ch(e.login,e.logout),0);
+  // Count present + paid entries as "worked"
+  const pres=pe.filter(e=>e.status==='present'||e.status==='paid').length;
+  const tH=pe.filter(e=>e.status==='present'||e.status==='paid').reduce((s,e)=>s+ch(e.login,e.logout),0);
 
-  // DAYS GOT PAID — present days from start up to today within this period
+  // DAYS GOT PAID — entries marked as "paid" in this period
+  const daysGotPaid=pe.filter(e=>e.status==='paid').length;
+
+  // DAYS NEED PAY — pending: present (not yet paid) entries in this period
+  // Plus remaining future working days (pending status)
+  const daysNeedPay=pe.filter(e=>e.status==='present').length;
+  // Remaining unlogged working days until period end
   const td=today();
-  const paidUpTo=td<p.from?p.from:td>p.to?p.to:td;
-  const daysGotPaid=entries.filter(e=>e.date>=p.from&&e.date<=paidUpTo&&e.status==='present').length;
-
-  // DAYS NEED TO GET PAID — present days from today+1 to period end
-  const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);const tomorrowStr=tomorrow.toISOString().slice(0,10);
-  const daysNeedPaid=entries.filter(e=>e.date>=tomorrowStr&&e.date<=p.to&&e.status==='present').length;
-  // also count remaining calendar working days (not yet logged)
-  const remainingDays=[];let cur=new Date(Math.max(new Date(tomorrowStr),new Date(p.from)));const end=new Date(p.to);
-  while(cur<=end){const ds=cur.toISOString().slice(0,10);if(!ge(ds)&&cur.getDay()!==6&&cur.getDay()!==0)remainingDays.push(ds);cur.setDate(cur.getDate()+1);}
+  const tom=new Date(td+'T12:00:00');tom.setDate(tom.getDate()+1);const tomStr=tom.toISOString().slice(0,10);
+  let remaining=0;let cur2=new Date(Math.max(new Date(tomStr),new Date(p.from+'T00:00:00')));const endD2=new Date(p.to+'T00:00:00');
+  while(cur2<=endD2){const ds=cur2.toISOString().slice(0,10);if(!ge(ds)&&cur2.getDay()!==6&&cur2.getDay()!==0)remaining++;cur2.setDate(cur2.getDate()+1);}
 
   document.getElementById('pay-daystats').innerHTML=`
-    <div class="pay-sc"><div class="pay-sc-n">${pres}</div><div class="pay-sc-l">Total Present</div></div>
+    <div class="pay-sc"><div class="pay-sc-n">${pres}</div><div class="pay-sc-l">Total Worked</div></div>
     <div class="pay-sc"><div class="pay-sc-n" style="color:var(--accent)">${daysGotPaid}</div><div class="pay-sc-l">Days Got Paid</div></div>
-    <div class="pay-sc"><div class="pay-sc-n" style="color:var(--holiday)">${daysNeedPaid+remainingDays.length}</div><div class="pay-sc-l">Days Need Pay</div></div>
+    <div class="pay-sc"><div class="pay-sc-n" style="color:var(--holiday)">${daysNeedPay+remaining}</div><div class="pay-sc-l">Days Need Pay</div></div>
     <div class="pay-sc"><div class="pay-sc-n" style="color:var(--accent2)">${tH.toFixed(1)}h</div><div class="pay-sc-l">Hours Worked</div></div>`;
 
   const td2=new Date();td2.setHours(0,0,0,0);
-  const start=new Date(p.from+'T00:00:00'),endD=new Date(p.to+'T00:00:00');
-  const total=Math.max((endD-start)/86400000,1),elapsed=Math.min(Math.max((td2-start)/86400000,0),total);
-  const pct=Math.round(elapsed/total*100);const dLeft=Math.max(Math.ceil((endD-td2)/86400000),0);
+  const start=new Date(p.from+'T00:00:00'),endPer=new Date(p.to+'T00:00:00');
+  const total=Math.max((endPer-start)/86400000,1),elapsed=Math.min(Math.max((td2-start)/86400000,0),total);
+  const pct=Math.round(elapsed/total*100);const dLeft=Math.max(Math.ceil((endPer-td2)/86400000),0);
   document.getElementById('pay-proginfo').innerHTML=`
     <div class="pay-ic"><div class="pay-il">Period Start</div><div class="pay-iv">${p.from}</div><div class="pay-ih">${bsDisp(p.from)} B.S.</div></div>
     <div class="pay-ic"><div class="pay-il">Period End / Pay Date</div><div class="pay-iv">${p.to}</div><div class="pay-ih">${bsDisp(p.to)} B.S.</div></div>
@@ -1646,10 +1735,10 @@ function renderPayHist(){
   const sorted=[...payPeriods].sort((a,b)=>b.from.localeCompare(a.from));
   const c=document.getElementById('pay-hist');
   if(!sorted.length){c.innerHTML='<div class="empty"><div class="empty-ic">💸</div><p>No pay periods yet. Click "+ Add Pay Period" to start.</p></div>';return;}
-  const sm={paid:'ppaid',pending:'ppend',overdue:'pover'};const sl={paid:'✓ Paid',pending:'⏳ Pending',overdue:'⚠ Overdue'};
+  const sm={paid:'ppaid',pending:'ppend'};const sl={paid:'✓ Paid',pending:'⏳ Pending'};
   c.innerHTML=sorted.map((p,i)=>{
     const ri=payPeriods.indexOf(p);
-    const pe=entries.filter(e=>e.date>=p.from&&e.date<=p.to);const pres=pe.filter(e=>e.status==='present').length;
+    const pe=entries.filter(e=>e.date>=p.from&&e.date<=p.to);const pres=pe.filter(e=>e.status==='present'||e.status==='paid').length;
     return`<div class="pay-hr"><div><div class="pay-hn">${p.notes||'Pay Period'}${p.tillToday&&p.status!=='paid'?` <span style="font-size:9px;color:var(--gold);background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.25);padding:1px 7px;border-radius:20px;font-weight:600">📅 Till Today</span>`:''}</div><div class="pay-hd">${p.from} → ${p.to} · ${pres} days present</div><div style="margin-top:5px"><span class="pstatus ${sm[p.status]}" style="font-size:10px;padding:2px 9px">${sl[p.status]}</span></div></div><div style="text-align:right"><div class="pay-ha2">${p.amount?'Rs. '+Number(p.amount).toLocaleString():'—'}</div><div style="display:flex;gap:5px;margin-top:7px;justify-content:flex-end"><button class="btn btn-sm" onclick="editPay(${ri})" style="color:rgba(245,200,66,.7);border-color:rgba(245,200,66,.18)">Edit</button><button class="btn btn-sm btn-d" onclick="delPay(${ri})">Del</button></div></div></div>`;
   }).join('');
 }
@@ -1669,35 +1758,11 @@ function delPay(idx){if(!confirm('Delete this pay period?'))return;payPeriods.sp
 // SEED DATA
 // ═══════════════════════════════════════════════
 function seedIfEmpty(){
-  // Clear ALL old data (March entries + old April entries) — fresh start from April 2025
-  const hasOldData = entries.some(e => e.date < '2025-04-01');
-  if(hasOldData){
-    entries = entries.filter(e => e.date >= '2025-04-01');
-    save();
+  // Wipe ALL data — start completely fresh, user enters everything manually
+  if(entries.length>0&&!localStorage.getItem('ax_wiped_v3')){
+    entries=[];save();
+    localStorage.setItem('ax_wiped_v3','1');
   }
-  // Only seed April holidays/offdays if truly no April data exists
-  if(entries.some(e => e.date >= '2025-04-01')) return;
-  const seed=[
-    {date:'2025-04-01',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-02',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-03',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-04',status:'holiday',login:'',logout:'',desc:''},
-    {date:'2025-04-05',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-06',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-07',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-08',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-09',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-10',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-11',status:'holiday',login:'',logout:'',desc:''},
-    {date:'2025-04-12',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-13',status:'offday',login:'',logout:'',desc:''},
-    {date:'2025-04-14',status:'holiday',login:'',logout:'',desc:'Nepali New Year 🎉 (2083 Baisakh 1)'},
-    {date:'2025-04-18',status:'holiday',login:'',logout:'',desc:''},
-    {date:'2025-04-25',status:'holiday',login:'',logout:'',desc:''}
-  ];
-  seed.forEach(e=>{e.bsDate=bsStr(e.date);});
-  entries=seed.sort((a,b)=>b.date.localeCompare(a.date));
-  save();
 }
 seedIfEmpty();
 
@@ -1707,8 +1772,17 @@ seedIfEmpty();
 document.getElementById('fmonth').value=today().slice(0,7);
 document.getElementById('s-name').value=settings.name||'Rohan Adhikari';
 document.getElementById('s-dept').value=settings.dept||'Administrator';
+document.getElementById('s-empid').value=settings.empid||'';
 document.getElementById('s-start').value=settings.start||'09:00';
 document.getElementById('s-end').value=settings.end||'17:00';
+// Sync sidebar profile card from saved settings
+(()=>{
+  const n=settings.name||'Rohan Adhikari';
+  const initials=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const sbA=document.getElementById('sb-avatar');if(sbA)sbA.textContent=initials;
+  const sbN=document.getElementById('sb-name');if(sbN)sbN.textContent=n;
+  const sbR=document.getElementById('sb-role');if(sbR)sbR.textContent=settings.dept||'Administrator';
+})();
 renderDash();
 if(timerState.active)updateTimerUI();
 updateNotifStatusUI();
@@ -1718,7 +1792,6 @@ updateNotifStatusUI();
   const params=new URLSearchParams(window.location.search);
   const action=params.get('action');
   if(action==='log'){setTimeout(()=>openEntryModal(),400);}
-  if(action==='dashboard'){/* already default */}
 })();
 </script>
 </body>

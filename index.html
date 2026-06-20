@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#000000" />
+<title>Office Log</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#000000; --bg1:#0a0a0b; --bg2:#111113; --panel:#141416; --panel2:#1b1b1e;
+  --line:#262629; --line2:#323237; --ink:#ffffff; --ink2:#e6e6ea; --muted:#8a8a93; --muted2:#5f5f68;
+  --accent:#34d399; --accent2:#22c55e;
+  --present:#34d399; --holiday:#60a5fa; --leave:#fbbf24; --offday:#94a3b8;
+  --paid:#22c55e; --unpaid:#ef4444;
+  --present-s:rgba(52,211,153,.15); --holiday-s:rgba(96,165,250,.15);
+  --leave-s:rgba(251,191,36,.15); --offday-s:rgba(148,163,184,.15);
+  --r:16px; --r-sm:11px;
+  --shadow:0 16px 44px -18px rgba(0,0,0,.85);
+  --font:'Plus Jakarta Sans',-apple-system,system-ui,sans-serif;
+  --mono:'Space Mono','JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font); color:var(--ink); background:var(--bg);
+  -webkit-font-smoothing:antialiased; min-height:100vh;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+button{font-family:inherit;cursor:pointer;border:none;color:inherit;background:none}
+input,select,textarea{font-family:inherit;color:var(--ink)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+svg{width:1em;height:1em;display:block}
+
+/* ---------- LOGIN ---------- */
+#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:22px;z-index:100;
+  background:radial-gradient(1000px 500px at 50% -10%, rgba(52,211,153,.07), transparent 60%), var(--bg)}
+.login-card{width:100%;max-width:370px;background:var(--panel);border:1px solid var(--line);border-radius:22px;
+  padding:36px 28px;box-shadow:var(--shadow);animation:rise .55s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+.brand .mk{width:46px;height:46px;border-radius:13px;background:linear-gradient(140deg,var(--accent),var(--accent2));
+  display:grid;place-items:center;color:#04130b;font-size:24px}
+.brand .mk svg{width:24px;height:24px}
+.brand h1{font-size:19px;font-weight:700;letter-spacing:-.3px}
+.brand p{font-size:12px;color:var(--muted)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+.field input{width:100%;padding:13px 14px;border-radius:11px;background:var(--bg1);border:1px solid var(--line);
+  font-size:15px;outline:none;transition:.18s}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(52,211,153,.13)}
+.btn{padding:13px 16px;border-radius:11px;font-size:14px;font-weight:600;transition:transform .14s,box-shadow .2s,background .15s,border-color .15s}
+.btn-primary{width:100%;background:linear-gradient(140deg,var(--accent),var(--accent2));color:#04130b;margin-top:6px}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 22px -8px rgba(52,211,153,.55)}
+.btn-ghost{background:var(--panel2);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--line2)}
+.err{color:var(--unpaid);font-size:13px;margin-top:11px;min-height:17px;text-align:center}
+.cfg-note{font-size:11px;color:var(--muted2);margin-top:18px;text-align:center;line-height:1.5}
+
+/* ---------- APP SHELL ---------- */
+#app{display:none;min-height:100vh;flex-direction:column}
+.appbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:13px 18px;background:rgba(10,10,11,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.appbar .who{display:flex;align-items:center;gap:11px;min-width:0}
+.appbar .mk{width:34px;height:34px;border-radius:9px;background:linear-gradient(140deg,var(--accent),var(--accent2));
+  display:grid;place-items:center;color:#04130b;flex-shrink:0}
+.appbar .mk svg{width:18px;height:18px}
+.appbar h2{font-size:15px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar .sync{font-size:10.5px;color:var(--muted)}
+.appbar .actions{display:flex;gap:7px;flex-shrink:0}
+.iconbtn{width:36px;height:36px;border-radius:10px;background:var(--panel);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:17px;color:var(--ink2);transition:.15s}
+.iconbtn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* tabs */
+.tabbar{position:sticky;top:61px;z-index:35;display:flex;gap:4px;overflow-x:auto;padding:10px 14px;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabbar::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;font-size:13px;font-weight:600;
+  color:var(--muted);white-space:nowrap;border:1px solid transparent;transition:.15s}
+.tab svg{width:16px;height:16px}
+.tab:hover{color:var(--ink2)}
+.tab.active{color:var(--ink);background:var(--panel);border-color:var(--line2)}
+.tab.active svg{color:var(--accent)}
+
+main{flex:1;max-width:1120px;width:100%;margin:0 auto;padding:20px 16px 90px}
+.view{display:none;animation:fade .3s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* cards */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card+.card{margin-top:16px}
+.card h3{font-size:12px;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card h3 svg{width:15px;height:15px;color:var(--accent)}
+.grid2{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:840px){.grid2{grid-template-columns:1fr 1fr}}
+.grid3{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:720px){.grid3{grid-template-columns:repeat(3,1fr)}}
+
+/* stat tiles */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:680px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:16px}
+.stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+.stat .lbl svg{width:13px;height:13px}
+.stat .n{font-family:var(--mono);font-size:25px;font-weight:700;margin-top:8px;letter-spacing:-1px}
+.stat .sub{font-size:11px;color:var(--muted2);margin-top:3px}
+.stat.accent .n{color:var(--accent)} .stat.green .n{color:var(--paid)} .stat.red .n{color:var(--unpaid)}
+.stat.blue .n{color:var(--holiday)} .stat.amber .n{color:var(--leave)}
+
+/* chart wrap */
+.chart-wrap{position:relative;height:240px}
+.chart-wrap.sm{height:200px}
+
+/* buttons row */
+.btnrow{display:flex;gap:9px;flex-wrap:wrap}
+.btnrow .btn{flex:0 0 auto}
+.btn-sm{padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;background:var(--panel2);border:1px solid var(--line)}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm.go{background:linear-gradient(140deg,var(--accent),var(--accent2));color:#04130b;border:none}
+.btn-sm.go:hover{color:#04130b}
+.btn-sm svg{width:15px;height:15px;display:inline-block;vertical-align:-2px;margin-right:5px}
+
+/* inputs */
+.frow{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.fcol{flex:1;min-width:130px}
+.fcol label{font-size:11px;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.fcol input,.fcol select,.fcol textarea{width:100%;padding:11px 12px;border-radius:10px;background:var(--bg1);
+  border:1px solid var(--line);font-size:14px;outline:none;transition:.15s}
+.fcol input:focus,.fcol select:focus,.fcol textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(52,211,153,.12)}
+input[type=date],input[type=time]{color-scheme:dark}
+
+/* table */
+.tablewrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:680px}
+thead th{text-align:left;padding:11px 12px;background:var(--bg1);color:var(--muted);font-weight:600;
+  font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--bg1)}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.pill i{width:7px;height:7px;border-radius:50%}
+.rowact{display:flex;gap:6px}
+.rowact button{width:30px;height:30px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:14px;transition:.14s}
+.rowact button:hover{border-color:var(--accent);color:var(--accent)}
+.rowact button.del:hover{border-color:var(--unpaid);color:var(--unpaid)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+
+/* calendars */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-nav{width:38px;height:38px;border-radius:10px;background:var(--bg1);border:1px solid var(--line);display:grid;place-items:center;font-size:18px;transition:.14s}
+.cal-nav:hover{border-color:var(--accent);color:var(--accent)}
+.cal-nav:disabled{opacity:.3;cursor:not-allowed}
+.cal-title{text-align:center}
+.cal-title .m{font-size:20px;font-weight:700;letter-spacing:-.4px}
+.cal-title .s{font-size:11.5px;color:var(--muted);margin-top:2px}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
+.dow span{text-align:center;font-size:11px;color:var(--muted);font-weight:600}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{aspect-ratio:1;border-radius:11px;background:var(--bg1);border:1px solid var(--line);position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:.13s;overflow:hidden}
+.day .bn{font-family:var(--mono);font-size:15px;font-weight:700;line-height:1}
+.day .an{font-size:9px;color:var(--muted);margin-top:2px}
+.day.empty{background:transparent;border:none;cursor:default}
+.day:not(.empty):hover{border-color:var(--accent);transform:translateY(-1px)}
+.day.today{outline:2px solid var(--accent);outline-offset:-2px}
+.day.sel{outline:2px solid var(--ink);outline-offset:-2px}
+/* status fills */
+.day.f-present{background:var(--present-s);border-color:rgba(52,211,153,.4)} .day.f-present .bn{color:var(--present)}
+.day.f-holiday{background:var(--holiday-s);border-color:rgba(96,165,250,.4)} .day.f-holiday .bn{color:var(--holiday)}
+.day.f-leave{background:var(--leave-s);border-color:rgba(251,191,36,.4)} .day.f-leave .bn{color:var(--leave)}
+.day.f-offday{background:var(--offday-s);border-color:rgba(148,163,184,.4)} .day.f-offday .bn{color:var(--offday)}
+/* pay fills (pay calendar) */
+.day.p-paid{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.45)} .day.p-paid .bn{color:var(--paid)}
+.day.p-unpaid{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.45)} .day.p-unpaid .bn{color:var(--unpaid)}
+/* pay dot (status calendar) */
+.day .paydot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%}
+.day .hol{position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--holiday)}
+.legend{display:flex;flex-wrap:wrap;gap:13px;margin-top:16px;font-size:11.5px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
+.legend i.dot{border-radius:50%;width:9px;height:9px}
+
+/* detail panel */
+.detail{background:var(--bg1);border:1px solid var(--line);border-radius:13px;padding:16px;margin-top:16px}
+.detail .dh{font-size:16px;font-weight:700}
+.detail .dsub{font-size:12px;color:var(--muted);margin-top:2px;margin-bottom:12px}
+.detail .drow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+.detail .drow:last-child{border-bottom:none}
+.detail .drow .k{color:var(--muted)}
+.detail .drow .v{font-weight:600}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(5px);display:none;
+  align-items:center;justify-content:center;padding:18px;z-index:120}
+.modal-bg.show{display:flex}
+.modal{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--line2);border-radius:20px;
+  padding:22px;box-shadow:var(--shadow);max-height:90vh;overflow-y:auto}
+.modal h4{font-size:18px;font-weight:700;margin-bottom:3px}
+.modal .msub{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
+.seg.four{grid-template-columns:1fr 1fr}
+.segbtn{padding:12px;border-radius:11px;border:1px solid var(--line);background:var(--bg1);font-size:13px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:7px;transition:.14s}
+.segbtn i{width:9px;height:9px;border-radius:50%}
+.segbtn.on{border-width:1.5px}
+.segbtn:hover{border-color:var(--line2)}
+.modal .mfoot{display:flex;gap:9px;margin-top:18px}
+.modal .mfoot .btn{flex:1}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(90px);background:var(--panel2);
+  border:1px solid var(--accent);padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;
+  box-shadow:var(--shadow);opacity:0;transition:.32s cubic-bezier(.2,.8,.2,1);z-index:130;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* holiday list */
+.hol-item{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line)}
+.hol-item:last-child{border-bottom:none}
+.hol-date{flex-shrink:0;width:62px;text-align:center;background:var(--bg1);border:1px solid var(--line);border-radius:10px;padding:8px 4px}
+.hol-date .d{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--holiday)}
+.hol-date .mo{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.hol-info .nm{font-size:14px;font-weight:600}
+.hol-info .ad{font-size:11.5px;color:var(--muted);margin-top:2px}
+.hol-past{opacity:.45}
+
+/* salary blocks */
+.salary-hero{background:linear-gradient(140deg,rgba(52,211,153,.12),rgba(34,197,94,.05));
+  border:1px solid rgba(52,211,153,.3);border-radius:16px;padding:20px;margin-bottom:16px}
+.salary-hero .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.salary-hero .amt{font-family:var(--mono);font-size:38px;font-weight:700;color:var(--accent);letter-spacing:-1.5px;margin-top:6px}
+.salary-hero .break{font-size:12.5px;color:var(--muted2);margin-top:6px}
+.mini-stat{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.mini-stat:last-child{border-bottom:none}
+.mini-stat .v{font-family:var(--mono);font-weight:700}
+
+/* settings */
+.set-group{margin-bottom:8px}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.set-row:last-child{border-bottom:none}
+.set-row .info .t{font-size:14px;font-weight:600}
+.set-row .info .d{font-size:11.5px;color:var(--muted);margin-top:2px}
+.set-row .ctl{flex-shrink:0}
+.set-row .ctl input{width:110px;padding:9px 11px;border-radius:9px;background:var(--bg1);border:1px solid var(--line);font-size:14px;outline:none;text-align:right}
+.set-row .ctl input:focus{border-color:var(--accent)}
+.switch{position:relative;width:46px;height:26px;border-radius:20px;background:var(--line2);transition:.2s;cursor:pointer}
+.switch.on{background:var(--accent)}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.switch.on::after{transform:translateX(20px)}
+.profile-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.avatar{width:58px;height:58px;border-radius:16px;background:linear-gradient(140deg,var(--accent),var(--accent2));
+  display:grid;place-items:center;color:#04130b;font-size:24px;font-weight:700}
+.section-title{font-size:12px;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);font-weight:700;margin:22px 0 10px}
+
+/* v3 additions: month groups + range breakdown */
+.month-group{margin-bottom:18px}
+.month-group:last-child{margin-bottom:0}
+.month-group-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.mg-title{font-size:14px;font-weight:700}
+.mg-meta{font-size:11.5px;color:var(--muted)}
+.range-break{margin-top:14px;background:var(--bg1);border:1px solid var(--line);border-radius:12px;padding:14px}
+.rb-row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.rb-row:last-of-type{border-bottom:none}
+.rb-k{flex-shrink:0;width:90px;font-weight:700}
+.rb-v{display:flex;flex-wrap:wrap;gap:5px}
+.daychip{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:2px 7px;font-family:var(--mono);font-size:11px}
+.rb-foot{margin-top:11px;padding-top:11px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+
+
+/* v4: calendar system toggle */
+.systoggle{display:inline-flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:16px}
+.sysbtn{padding:8px 16px;border-radius:9px;font-size:13px;font-weight:600;color:var(--muted);transition:.15s}
+.sysbtn.on{background:linear-gradient(140deg,var(--accent),var(--accent2));color:#04130b}
+.sysbtn:not(.on):hover{color:var(--ink2)}
+
+</style>
+</head>
+<body>
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-card">
+    <div class="brand">
+      <div class="mk" id="brandIcon"></div>
+      <div><h1>Office Log</h1><p>Attendance · Pay · Salary</p></div>
+    </div>
+    <div class="field"><label>Username</label><input id="u" type="text" autocomplete="username" placeholder="username" /></div>
+    <div class="field"><label>Password</label><input id="p" type="password" autocomplete="current-password" placeholder="••••••••" /></div>
+    <button class="btn btn-primary" id="loginBtn">Sign in</button>
+    <div class="err" id="loginErr"></div>
+    <p class="cfg-note" id="cfgNote"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="appbar">
+    <div class="who">
+      <div class="mk" id="barIcon"></div>
+      <div style="min-width:0">
+        <h2 id="barName">Rohan Adhikari</h2>
+        <div class="sync" id="syncState">—</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="iconbtn" id="quickLogBtn" title="Log a day"></button>
+      <button class="iconbtn" id="logoutBtn" title="Sign out"></button>
+    </div>
+  </div>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <main>
+    <section class="view" data-view="dashboard" id="v-dashboard"></section>
+    <section class="view" data-view="log" id="v-log"></section>
+    <section class="view" data-view="statuscal" id="v-statuscal"></section>
+    <section class="view" data-view="paycal" id="v-paycal"></section>
+    <section class="view" data-view="analytics" id="v-analytics"></section>
+    <section class="view" data-view="holidays" id="v-holidays"></section>
+    <section class="view" data-view="salary" id="v-salary"></section>
+    <section class="view" data-view="settings" id="v-settings"></section>
+  </main>
+</div>
+
+<!-- LOG/EDIT MODAL -->
+<div class="modal-bg" id="logModal">
+  <div class="modal">
+    <h4 id="lmTitle">Log a day</h4>
+    <div class="msub" id="lmSub"></div>
+    <div class="fcol" style="margin-bottom:13px">
+      <label>Date (AD)</label>
+      <input type="date" id="lmDate" />
+    </div>
+    <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:7px">Day status</label>
+    <div class="seg four" id="lmStatus"></div>
+    <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:7px">Pay status</label>
+    <div class="seg" id="lmPay"></div>
+    <div class="fcol" style="margin-bottom:4px">
+      <label>Description</label>
+      <textarea id="lmDesc" rows="2" placeholder="Notes about this day..."></textarea>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-ghost" id="lmCancel">Cancel</button>
+      <button class="btn btn-primary" id="lmSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+
+// Bikram Sambat <-> AD converter.
+const NP_MONTHS = ["Baisakh","Jestha","Ashadh","Shrawan","Bhadra","Ashwin","Kartik","Mangsir","Poush","Magh","Falgun","Chaitra"];
+const NP_DIGITS = ["०","१","२","३","४","५","६","७","८","९"];
+
+const BS_DATA = {
+2000:[30,32,31,32,31,30,30,30,29,30,29,31],
+2001:[31,31,32,31,31,31,30,29,30,29,30,30],
+2002:[31,31,32,32,31,30,30,29,30,29,30,30],
+2003:[31,32,31,32,31,30,30,30,29,29,30,31],
+2004:[30,32,31,32,31,30,30,30,29,30,29,31],
+2005:[31,31,32,31,31,31,30,29,30,29,30,30],
+2006:[31,31,32,32,31,30,30,29,30,29,30,30],
+2007:[31,32,31,32,31,30,30,30,29,29,30,31],
+2008:[31,31,31,32,31,31,29,30,30,29,29,31],
+2009:[31,31,32,31,31,31,30,29,30,29,30,30],
+2010:[31,31,32,32,31,30,30,29,30,29,30,30],
+2011:[31,32,31,32,31,30,30,30,29,29,30,31],
+2012:[31,31,31,32,31,31,29,30,30,29,30,30],
+2013:[31,31,32,31,31,31,30,29,30,29,30,30],
+2014:[31,31,32,32,31,30,30,29,30,29,30,30],
+2015:[31,32,31,32,31,30,30,30,29,29,30,31],
+2016:[31,31,31,32,31,31,29,30,30,29,30,30],
+2017:[31,31,32,31,31,31,30,29,30,29,30,30],
+2018:[31,32,31,32,31,30,30,29,30,29,30,30],
+2019:[31,32,31,32,31,30,30,30,29,30,29,31],
+2020:[31,31,31,32,31,31,30,29,30,29,30,30],
+2021:[31,31,32,31,31,31,30,29,30,29,30,30],
+2022:[31,32,31,32,31,30,30,30,29,29,30,30],
+2023:[31,32,31,32,31,30,30,30,29,30,29,31],
+2024:[31,31,31,32,31,31,30,29,30,29,30,30],
+2025:[31,31,32,31,31,31,30,29,30,29,30,30],
+2026:[31,32,31,32,31,30,30,30,29,29,30,31],
+2027:[30,32,31,32,31,30,30,30,29,30,29,31],
+2028:[31,31,32,31,31,31,30,29,30,29,30,30],
+2029:[31,31,32,31,32,30,30,29,30,29,30,30],
+2030:[31,32,31,32,31,30,30,30,29,29,30,31],
+2031:[30,32,31,32,31,30,30,30,29,30,29,31],
+2032:[31,31,32,31,31,31,30,29,30,29,30,30],
+2033:[31,31,32,32,31,30,30,29,30,29,30,30],
+2034:[31,32,31,32,31,30,30,30,29,29,30,31],
+2035:[30,32,31,32,31,31,29,30,30,29,29,31],
+2036:[31,31,32,31,31,31,30,29,30,29,30,30],
+2037:[31,31,32,32,31,30,30,29,30,29,30,30],
+2038:[31,32,31,32,31,30,30,30,29,29,30,31],
+2039:[31,31,31,32,31,31,29,30,30,29,30,30],
+2040:[31,31,32,31,31,31,30,29,30,29,30,30],
+2041:[31,31,32,32,31,30,30,29,30,29,30,30],
+2042:[31,32,31,32,31,30,30,30,29,29,30,31],
+2043:[31,31,31,32,31,31,29,30,30,29,30,30],
+2044:[31,31,32,31,31,31,30,29,30,29,30,30],
+2045:[31,32,31,32,31,30,30,29,30,29,30,30],
+2046:[31,32,31,32,31,30,30,30,29,29,30,31],
+2047:[31,31,31,32,31,31,30,29,30,29,30,30],
+2048:[31,31,32,31,31,31,30,29,30,29,30,30],
+2049:[31,32,31,32,31,30,30,30,29,29,30,30],
+2050:[31,32,31,32,31,30,30,30,29,30,29,31],
+2051:[31,31,31,32,31,31,30,29,30,29,30,30],
+2052:[31,31,32,31,31,31,30,29,30,29,30,30],
+2053:[31,32,31,32,31,30,30,30,29,29,30,30],
+2054:[31,32,31,32,31,30,30,30,29,30,29,31],
+2055:[31,31,32,31,31,31,30,29,30,29,30,30],
+2056:[31,31,32,31,32,30,30,29,30,29,30,30],
+2057:[31,32,31,32,31,30,30,30,29,29,30,31],
+2058:[30,32,31,32,31,30,30,30,29,30,29,31],
+2059:[31,31,32,31,31,31,30,29,30,29,30,30],
+2060:[31,31,32,32,31,30,30,29,30,29,30,30],
+2061:[31,32,31,32,31,30,30,30,29,29,30,31],
+2062:[30,32,31,32,31,31,29,30,29,30,29,31],
+2063:[31,31,32,31,31,31,30,29,30,29,30,30],
+2064:[31,31,32,32,31,30,30,29,30,29,30,30],
+2065:[31,32,31,32,31,30,30,30,29,29,30,31],
+2066:[31,31,31,32,31,31,29,30,30,29,29,31],
+2067:[31,31,32,31,31,31,30,29,30,29,30,30],
+2068:[31,31,32,32,31,30,30,29,30,29,30,30],
+2069:[31,32,31,32,31,30,30,30,29,29,30,31],
+2070:[31,31,31,32,31,31,29,30,30,29,30,30],
+2071:[31,31,32,31,31,31,30,29,30,29,30,30],
+2072:[31,32,31,32,31,30,30,29,30,29,30,30],
+2073:[31,32,31,32,31,30,30,30,29,29,30,31],
+2074:[31,31,31,32,31,31,30,29,30,29,30,30],
+2075:[31,31,32,31,31,31,30,29,30,29,30,30],
+2076:[31,32,31,32,31,30,30,30,29,29,30,30],
+2077:[31,32,31,32,31,30,30,30,29,30,29,31],
+2078:[31,31,31,32,31,31,30,29,30,29,30,30],
+2079:[31,31,32,31,31,31,30,29,30,29,30,30],
+2080:[31,32,31,32,31,30,30,30,29,29,30,30],
+2081:[31,32,31,32,31,30,30,30,29,30,29,31],
+2082:[31,31,32,31,31,31,30,29,30,29,30,30],
+2083:[31,31,32,31,31,31,30,29,30,29,30,30],
+2084:[31,32,31,32,31,30,30,30,29,29,30,31],
+2085:[30,32,31,32,31,30,30,30,29,30,29,31],
+2086:[31,31,32,31,31,31,30,29,30,29,30,30],
+2087:[31,31,32,32,31,30,30,29,30,29,30,30],
+2088:[31,32,31,32,31,30,30,30,29,29,30,31],
+2089:[30,32,31,32,31,30,30,30,29,30,29,31],
+2090:[31,31,32,31,31,31,30,29,30,29,30,30],
+};
+
+const BS_EPOCH = new Date(1943, 3, 14);
+const DAY_MS = 86400000;
+function bsToDayCount(y,m,d){ let n=0; for(let yr=2000;yr<y;yr++){for(let mo=0;mo<12;mo++)n+=BS_DATA[yr][mo];} for(let mo=0;mo<m-1;mo++)n+=BS_DATA[y][mo]; n+=d-1; return n; }
+function bsToAd(y,m,d){ return new Date(BS_EPOCH.getTime()+bsToDayCount(y,m,d)*DAY_MS); }
+function adToBs(date){ const d0=new Date(date.getFullYear(),date.getMonth(),date.getDate()); let diff=Math.round((d0-BS_EPOCH)/DAY_MS); let y=2000; while(BS_DATA[y]){ const yd=BS_DATA[y].reduce((a,b)=>a+b,0); if(diff<yd)break; diff-=yd;y++; } let m=0; while(diff>=BS_DATA[y][m]){ diff-=BS_DATA[y][m]; m++; } return {y,m:m+1,d:diff+1}; }
+function bsMonthDays(y,m){ return BS_DATA[y]?BS_DATA[y][m-1]:30; }
+function npNum(n){ return String(n).split('').map(c=>NP_DIGITS[+c]||c).join(''); }
+function isoKey(date){ return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0'); }
+const NP_DAYS=["Aaitabar","Sombar","Mangalbar","Budhabar","Bihibar","Sukrabar","Sanibar"];
+const EN_DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function dayName(date){ return EN_DAYS[date.getDay()]; }
+function npDayName(date){ return NP_DAYS[date.getDay()]; }
+
+/* Built-in Nepali public holidays */
+const HOLIDAYS_BS = [
+  { y:2082, m:1,  d:1,  name:"Nepali New Year (Naya Barsha)" },
+  { y:2082, m:1,  d:18, name:"Loktantra Diwas" },
+  { y:2082, m:2,  d:15, name:"Buddha Jayanti" },
+  { y:2082, m:6,  d:10, name:"Ghatasthapana (Dashain begins)" },
+  { y:2082, m:6,  d:17, name:"Fulpati" },
+  { y:2082, m:6,  d:18, name:"Maha Ashtami" },
+  { y:2082, m:6,  d:19, name:"Maha Nawami" },
+  { y:2082, m:6,  d:20, name:"Vijaya Dashami" },
+  { y:2082, m:7,  d:5,  name:"Laxmi Puja (Tihar)" },
+  { y:2082, m:7,  d:7,  name:"Govardhan Puja / Mha Puja" },
+  { y:2082, m:7,  d:8,  name:"Bhai Tika" },
+  { y:2082, m:8,  d:11, name:"Chhath Parba" },
+  { y:2082, m:9,  d:10, name:"Tamu Lhosar" },
+  { y:2082, m:10, d:1,  name:"Maghe Sankranti" },
+  { y:2082, m:10, d:16, name:"Sonam Lhosar" },
+  { y:2082, m:11, d:7,  name:"Maha Shivaratri" },
+  { y:2082, m:11, d:16, name:"Gyalpo Lhosar" },
+  { y:2082, m:12, d:3,  name:"Fagu Purnima (Holi)" },
+  { y:2083, m:1,  d:1,  name:"Nepali New Year (Naya Barsha)" },
+  { y:2083, m:1,  d:8,  name:"Loktantra Diwas" },
+  { y:2083, m:1,  d:19, name:"Ram Nawami" },
+  { y:2083, m:2,  d:4,  name:"Buddha Jayanti" },
+  { y:2083, m:6,  d:29, name:"Ghatasthapana (Dashain begins)" },
+  { y:2083, m:7,  d:6,  name:"Fulpati" },
+  { y:2083, m:7,  d:7,  name:"Maha Ashtami" },
+  { y:2083, m:7,  d:8,  name:"Maha Nawami" },
+  { y:2083, m:7,  d:9,  name:"Vijaya Dashami" },
+  { y:2083, m:7,  d:24, name:"Laxmi Puja (Tihar)" },
+  { y:2083, m:7,  d:26, name:"Govardhan Puja / Mha Puja" },
+  { y:2083, m:7,  d:27, name:"Bhai Tika" },
+  { y:2083, m:8,  d:1,  name:"Chhath Parba" },
+  { y:2083, m:10, d:1,  name:"Maghe Sankranti" },
+  { y:2083, m:11, d:1,  name:"Maha Shivaratri" },
+  { y:2083, m:12, d:8,  name:"Fagu Purnima (Holi)" },
+];
+
+/* Inline SVG icons */
+const ICONS = {
+  dashboard:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>',
+  log:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h16"/><circle cx="2" cy="5" r="0.5"/></svg>',
+  calStatus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/><circle cx="12" cy="15" r="2"/></svg>',
+  calPay:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M9 15l2 2 4-4"/></svg>',
+  analytics:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>',
+  holiday:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 8c-3 0-6 2-6 6 4 0 6-2 6-6zM12 8c3 0 6 2 6 6-4 0-6-2-6-6z"/><path d="M12 14v8"/></svg>',
+  salary:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 8h6M9 12h6M11 8c2 0 3 1.5 3 3.5S13 16 11 16l3 3"/></svg>',
+  settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  logout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>',
+  chevL:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  chevR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+  download:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
+  upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+};
+function icon(name){ return ICONS[name]||''; }
+
+/* ===== CONFIG ===== */
+const SUPABASE_URL = "https://saqkrbrygkueqcsggtva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhcWtyYnJ5Z2t1ZXFjc2dndHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMTEyMzcsImV4cCI6MjA5NTg4NzIzN30.Yipum1s69asaBJdhplAs1izsgd80tJoWijUqgQOSIGw";
+const AUTH_USER = "Rohan Adhikari";
+const AUTH_PASS = "Krsn@";
+
+const STATUS_META = {
+  present: { label:"Present", color:"#34d399", soft:"rgba(52,211,153,.16)" },
+  holiday: { label:"Holiday", color:"#60a5fa", soft:"rgba(96,165,250,.16)" },
+  leave:   { label:"Leave",   color:"#fbbf24", soft:"rgba(251,191,36,.16)" },
+  offday:  { label:"Offday",  color:"#94a3b8", soft:"rgba(148,163,184,.16)" },
+};
+const PAY_META = { paid:{label:"Paid",color:"#22c55e"}, unpaid:{label:"Unpaid",color:"#ef4444"} };
+const DEFAULT_SALARY = { base:5000, perPresent:800, currency:"Rs" };
+
+let sb=null, DB={}, PROFILE={};
+
+function initSupabase(){ if(SUPABASE_URL&&SUPABASE_ANON_KEY&&window.supabase){ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); return true; } return false; }
+async function loadAll(){
+  PROFILE=JSON.parse(localStorage.getItem('ol_profile')||'null')||{name:"Rohan Adhikari",role:"Office Staff",salary:{...DEFAULT_SALARY},reminders:{in:"11:00",out:"17:00",enabled:false},autoOffSaturday:false};
+  if(sb){ try{ const {data,error}=await sb.from('attendance').select('*'); if(error)throw error; DB={}; (data||[]).forEach(r=>{DB[r.day]={day:r.day,status:r.status,pay:r.pay,inT:r.in_time,outT:r.out_time,desc:r.descr};}); return; }catch(e){ console.warn('cloud load failed:',e.message);} }
+  DB=JSON.parse(localStorage.getItem('ol_records')||'{}');
+}
+function cacheLocal(){ localStorage.setItem('ol_records',JSON.stringify(DB)); }
+function saveProfile(){ localStorage.setItem('ol_profile',JSON.stringify(PROFILE)); }
+async function upsertDay(key){ cacheLocal(); if(sb){ const r=DB[key]||{}; try{ await sb.from('attendance').upsert({day:key,status:r.status||null,pay:r.pay||null,in_time:r.inT||null,out_time:r.outT||null,descr:r.desc||null},{onConflict:'day'}); }catch(e){ console.warn('save failed:',e.message);} } }
+async function upsertMany(keys){ cacheLocal(); if(sb){ const rows=keys.map(key=>{const r=DB[key]||{};return{day:key,status:r.status||null,pay:r.pay||null,in_time:r.inT||null,out_time:r.outT||null,descr:r.desc||null};}); try{ await sb.from('attendance').upsert(rows,{onConflict:'day'}); }catch(e){ console.warn('bulk save failed:',e.message);} } }
+async function deleteDay(key){ delete DB[key]; cacheLocal(); if(sb){ try{ await sb.from('attendance').delete().eq('day',key); }catch(e){ console.warn(e.message);} } }
+function getRec(key){ return DB[key]||null; }
+function setRec(key,patch){ DB[key]=Object.assign({day:key},DB[key]||{},patch); const r=DB[key]; if(!r.status&&!r.pay&&!r.inT&&!r.outT&&!r.desc) delete DB[key]; }
+function durationMin(a,b){ if(!a||!b)return 0; const[ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number); let m=(bh*60+bm)-(ah*60+am); if(m<0)m+=1440; return m; }
+function hoursStr(a,b){ const m=durationMin(a,b); return m?Math.floor(m/60)+'h '+(m%60)+'m':'—'; }
+function hoursDec(a,b){ return +(durationMin(a,b)/60).toFixed(2); }
+
+/* ===== MAIN APP ===== */
+const TABS=[
+  {id:'dashboard',label:'Dashboard',icon:'dashboard'},
+  {id:'log',label:'Daily Log',icon:'log'},
+  {id:'statuscal',label:'Status Calendar',icon:'calStatus'},
+  {id:'paycal',label:'Pay Calendar',icon:'calPay'},
+  {id:'analytics',label:'Analytics',icon:'analytics'},
+  {id:'holidays',label:'Holidays',icon:'holiday'},
+  {id:'salary',label:'Salary',icon:'salary'},
+  {id:'settings',label:'Settings',icon:'settings'},
+];
+let currentTab='dashboard';
+let charts={};
+const today=new Date();
+const todayKey=isoKey(today);
+// AD-based calendar view state
+let scState={sys:null,y:null,m:null}, pcState={sys:null,y:null,m:null};
+let scSel=null, pcSel=null;
+let logFilter={ sys:null, y:null, m:null, status:'all' };
+let editKey=null, lmStatusVal=null, lmPayVal=null;
+
+document.getElementById('brandIcon').innerHTML=icon('clock');
+document.getElementById('barIcon').innerHTML=icon('clock');
+document.getElementById('quickLogBtn').innerHTML=icon('plus');
+document.getElementById('logoutBtn').innerHTML=icon('logout');
+document.getElementById('cfgNote').textContent=SUPABASE_URL?"":"Local-device mode. Add Supabase keys to sync.";
+document.getElementById('loginBtn').onclick=doLogin;
+document.getElementById('p').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('u').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('p').focus();});
+document.getElementById('logoutBtn').onclick=doLogout;
+document.getElementById('quickLogBtn').onclick=()=>openLog(todayKey);
+document.getElementById('lmCancel').onclick=closeLog;
+document.getElementById('lmSave').onclick=saveLog;
+if(sessionStorage.getItem('ol_in')==='1') boot();
+
+function doLogin(){ const u=document.getElementById('u').value.trim(); const p=document.getElementById('p').value; if(u===AUTH_USER&&p===AUTH_PASS){ sessionStorage.setItem('ol_in','1'); boot(); } else document.getElementById('loginErr').textContent="Incorrect username or password."; }
+function doLogout(){ sessionStorage.removeItem('ol_in'); document.getElementById('app').style.display='none'; document.getElementById('login').style.display='flex'; document.getElementById('p').value=''; }
+
+async function boot(){
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='flex';
+  initSupabase();
+  await loadAll();
+  document.getElementById('syncState').textContent=sb?"Synced via cloud":"Saved on this device";
+  document.getElementById('barName').textContent=PROFILE.name||"Office Log";
+  // calendar/log states initialize lazily per their remembered system inside each renderer
+  buildTabs(); switchTab('dashboard'); registerSW(); setupNotifications();
+}
+function buildTabs(){ const bar=document.getElementById('tabbar'); bar.innerHTML=''; TABS.forEach(t=>{ const b=document.createElement('button'); b.className='tab'+(t.id===currentTab?' active':''); b.dataset.tab=t.id; b.innerHTML=icon(t.icon)+'<span>'+t.label+'</span>'; b.onclick=()=>switchTab(t.id); bar.appendChild(b); }); }
+function switchTab(id){
+  currentTab=id;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.dataset.view===id));
+  const at=document.querySelector('.tab.active'); if(at)at.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+  const R={dashboard:renderDashboard,log:renderLog,statuscal:renderStatusCal,paycal:renderPayCal,analytics:renderAnalytics,holidays:renderHolidays,salary:renderSalary,settings:renderSettings};
+  R[id](); window.scrollTo({top:0,behavior:'instant'});
+}
+function allRecordsSorted(){ return Object.keys(DB).sort().map(k=>({key:k,...DB[k]})); }
+function statusPill(status){ if(!status)return '<span class="pill" style="background:var(--bg2);color:var(--muted)">—</span>'; const m=STATUS_META[status]; return `<span class="pill" style="background:${m.soft};color:${m.color}"><i style="background:${m.color}"></i>${m.label}</span>`; }
+function payPill(pay){ if(!pay)return '<span class="pill" style="background:var(--bg2);color:var(--muted)">—</span>'; const m=PAY_META[pay]; return `<span class="pill" style="background:${m.color}22;color:${m.color}"><i style="background:${m.color}"></i>${m.label}</span>`; }
+function fmtAD(d){ return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+function bsStr(b){ return `${NP_MONTHS[b.m-1]} ${b.d}, ${b.y}`; }
+
+/* charts base */
+const CH_GRID='#262629', CH_TICK='#8a8a93';
+function destroyChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+function baseOpts(extra={}){ return Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:CH_TICK,font:{family:"'Plus Jakarta Sans'"}}}},scales:{x:{grid:{color:CH_GRID},ticks:{color:CH_TICK}},y:{grid:{color:CH_GRID},ticks:{color:CH_TICK},beginAtZero:true}}},extra); }
+function drawStatusChart(id,recs){ destroyChart(id); const c={present:0,holiday:0,leave:0,offday:0}; recs.forEach(r=>{if(r.status)c[r.status]++;}); charts[id]=new Chart(document.getElementById(id),{type:'doughnut',data:{labels:['Present','Holiday','Leave','Offday'],datasets:[{data:[c.present,c.holiday,c.leave,c.offday],backgroundColor:['#34d399','#60a5fa','#fbbf24','#94a3b8'],borderColor:'#141416',borderWidth:2}]},options:baseOpts({scales:{},cutout:'62%'})}); }
+function drawPayChart(id,recs){ destroyChart(id); const paid=recs.filter(r=>r.pay==='paid').length,unpaid=recs.filter(r=>r.pay==='unpaid').length; charts[id]=new Chart(document.getElementById(id),{type:'doughnut',data:{labels:['Paid','Unpaid'],datasets:[{data:[paid,unpaid],backgroundColor:['#22c55e','#ef4444'],borderColor:'#141416',borderWidth:2}]},options:baseOpts({scales:{},cutout:'62%'})}); }
+function longestPresentStreak(all){ const keys=all.filter(r=>r.status==='present').map(r=>r.key).sort(); let best=0,cur=0,prev=null; keys.forEach(k=>{const d=new Date(k); if(prev&&(d-prev)===86400000)cur++; else cur=1; prev=d; if(cur>best)best=cur;}); return best; }
+
+function escapeHtml(s){ return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function confirmDelete(key){ if(confirm('Delete this day’s record? This cannot be undone.')){ deleteDay(key).then(()=>{ toast('Entry deleted'); refreshCurrent(); }); } }
+/* ===== NEW: AD-month helpers (added for v3) ===== */
+const EN_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+// AD month key 'YYYY-MM' from an ISO day key
+function adMonthKey(isoDay){ return isoDay.slice(0,7); }
+function adMonthLabel(mk){ const [y,m]=mk.split('-'); return EN_MONTHS[+m-1]+' '+y; }
+
+// total calendar days in an AD month
+function adDaysInMonth(y,m){ return new Date(y, m, 0).getDate(); } // m is 1-based
+
+// records grouped by AD month -> { 'YYYY-MM': [recs...] }, sorted keys desc (newest first)
+function recordsByAdMonth(){
+  const groups={};
+  Object.keys(DB).sort().forEach(k=>{
+    const mk=adMonthKey(k);
+    (groups[mk]=groups[mk]||[]).push({key:k, ...DB[k]});
+  });
+  return groups;
+}
+// all records in a given AD month (y 4-digit, m 1-based)
+function recordsInAdMonth(y,m){
+  const mk=y+'-'+String(m).padStart(2,'0');
+  return Object.keys(DB).filter(k=>adMonthKey(k)===mk).sort().map(k=>({key:k, ...DB[k]}));
+}
+// salary for an AD month
+function salaryFromRecords(recs){
+  const base=PROFILE.salary.base, per=PROFILE.salary.perPresent;
+  // a day is "payable" (earns per-day rate) if it is Present OR marked Unpaid; count each day once
+  const payable=recs.filter(r=> r.status==='present' || r.pay==='unpaid').length;
+  const present=recs.filter(r=>r.status==='present').length;
+  const unpaid=recs.filter(r=>r.pay==='unpaid').length;
+  return { payable, present, unpaid, base, per, total: base+payable*per };
+}
+function salaryForAdMonth(y,m){ return salaryFromRecords(recordsInAdMonth(y,m)); }
+// all unpaid records across all months, newest first
+function allUnpaid(){
+  return Object.keys(DB).filter(k=>DB[k].pay==='unpaid').sort().reverse().map(k=>({key:k, ...DB[k]}));
+}
+function allPaid(){
+  return Object.keys(DB).filter(k=>DB[k].pay==='paid').sort().reverse().map(k=>({key:k, ...DB[k]}));
+}
+
+/* ============================================================
+   UNIFIED CALENDAR SYSTEM LAYER (AD or BS)
+   CAL.sys is 'ad' or 'bs'. Persisted per-view in localStorage.
+   A "month" is identified by {y,m}. These helpers translate that
+   into the set of AD date-keys belonging to that month in either
+   system, so every renderer works uniformly.
+   ============================================================ */
+const CAL = {
+  // remembered system per view
+  status: localStorage.getItem('ol_sys_status') || 'bs',
+  pay:    localStorage.getItem('ol_sys_pay')    || 'bs',
+  log:    localStorage.getItem('ol_sys_log')    || 'bs',
+  ana:    localStorage.getItem('ol_sys_ana')    || 'bs',
+};
+function setSys(view,sys){ CAL[view]=sys; localStorage.setItem('ol_sys_'+view,sys); }
+
+// month label for a system
+function monthLabel(sys,y,m){ return sys==='bs' ? `${NP_MONTHS[m-1]} ${y}` : `${EN_MONTHS[m-1]} ${y}`; }
+// number of days in a (system) month
+function sysMonthDays(sys,y,m){ return sys==='bs' ? bsMonthDays(y,m) : adDaysInMonth(y,m); }
+// AD Date object of day 1 of a (system) month
+function sysFirstAD(sys,y,m){ return sys==='bs' ? bsToAd(y,m,1) : new Date(y,m-1,1); }
+// AD date for day d of a (system) month
+function sysDayAD(sys,y,m,d){ return sys==='bs' ? bsToAd(y,m,d) : new Date(y,m-1,d); }
+// given an AD date, the {y,m,d} in the system
+function sysFromAD(sys,ad){ if(sys==='bs') return adToBs(ad); return {y:ad.getFullYear(), m:ad.getMonth()+1, d:ad.getDate()}; }
+// today in the system
+function sysToday(sys){ return sysFromAD(sys, today); }
+// step a month within system limits (no hard lower bound for AD; BS limited by table)
+function stepMonth(sys,y,m,dir){
+  let nm=m+dir, ny=y;
+  if(nm>12){nm=1;ny++;} if(nm<1){nm=12;ny--;}
+  if(sys==='bs' && !BS_DATA[ny]) return null;
+  return {y:ny,m:nm};
+}
+// records in a (system) month, sorted by date
+function recordsInMonth(sys,y,m){
+  const days=sysMonthDays(sys,y,m); const out=[];
+  for(let d=1;d<=days;d++){ const k=isoKey(sysDayAD(sys,y,m,d)); if(DB[k]) out.push({key:k, sysd:{y,m,d}, ...DB[k]}); }
+  return out;
+}
+// group ALL records by (system) month -> { 'sys-y-m': {y,m,recs:[]} }, newest first
+function recordsBySysMonth(sys){
+  const groups={};
+  Object.keys(DB).sort().forEach(k=>{
+    const ad=new Date(k); const s=sysFromAD(sys,ad);
+    const mk=s.y+'-'+String(s.m).padStart(2,'0');
+    (groups[mk]=groups[mk]||{y:s.y,m:s.m,recs:[]}).recs.push({key:k, sysd:s, ...DB[k]});
+  });
+  return groups;
+}
+function salaryForMonth(sys,y,m){ return salaryFromRecords(recordsInMonth(sys,y,m)); }
+/* ============================================================
+   v3 RENDERERS — AD-focused, AD-month grouping, new features
+   ============================================================ */
+
+/* ---- shared: a compact month-log block (used under calendars) ---- */
+/* ---- system toggle control (rendered atop a view) ---- */
+function sysToggle(view){
+  const cur=CAL[view];
+  return `<div class="systoggle">
+    <button class="sysbtn ${cur==='bs'?'on':''}" onclick="switchSys('${view}','bs')">Nepali (BS)</button>
+    <button class="sysbtn ${cur==='ad'?'on':''}" onclick="switchSys('${view}','ad')">English (AD)</button>
+  </div>`;
+}
+function switchSys(view,sys){
+  if(CAL[view]===sys) return;
+  setSys(view,sys);
+  const R={status:renderStatusCal,pay:renderPayCal,log:renderLog,ana:renderAnalytics};
+  R[view]();
+}
+
+/* ---- shared: month-wise log grouped in a given system ---- */
+function monthLogBlock(sys){
+  const groups=recordsBySysMonth(sys);
+  const keys=Object.keys(groups).sort().reverse();
+  if(keys.length===0) return `<div class="empty-state">No logs yet.</div>`;
+  let html='';
+  keys.forEach(mk=>{
+    const g=groups[mk]; const recs=g.recs.sort((a,b)=>a.key<b.key?-1:1);
+    const present=recs.filter(r=>r.status==='present').length;
+    const paid=recs.filter(r=>r.pay==='paid').length;
+    const unpaid=recs.filter(r=>r.pay==='unpaid').length;
+    let rows='';
+    recs.forEach(r=>{
+      const ad=new Date(r.key); const b=adToBs(ad);
+      rows+=`<tr>
+        <td class="mono">${ad.getDate()} ${EN_MONTHS[ad.getMonth()].slice(0,3)}</td>
+        <td class="mono">${b.d} ${NP_MONTHS[b.m-1].slice(0,3)}</td>
+        <td>${dayName(ad).slice(0,3)}</td>
+        <td>${statusPill(r.status)}</td>
+        <td>${payPill(r.pay)}</td>
+        <td><div class="rowact"><button title="Edit" onclick="openLog('${r.key}')">${icon('edit')}</button></div></td>
+      </tr>`;
+    });
+    html+=`<div class="month-group">
+      <div class="month-group-head">
+        <span class="mg-title">${monthLabel(sys,g.y,g.m)}</span>
+        <span class="mg-meta">${recs.length} logged · ${present} present · <span style="color:var(--paid)">${paid} paid</span> · <span style="color:var(--unpaid)">${unpaid} unpaid</span></span>
+      </div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>AD</th><th>BS</th><th>Day</th><th>Status</th><th>Pay</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+    </div>`;
+  });
+  return html;
+}
+
+/* ============================================================
+   1. DASHBOARD
+   ============================================================ */
+function renderDashboard(){
+  const y=today.getFullYear(), m=today.getMonth()+1;
+  const recs=recordsInAdMonth(y,m);
+  const b=adToBs(today);
+  const totalLog=recs.length;                                   // every status counted
+  const present=recs.filter(r=>r.status==='present').length;
+  const paid=recs.filter(r=>r.pay==='paid').length;
+  const unpaid=recs.filter(r=>r.pay==='unpaid').length;
+  const todayRec=DB[todayKey];
+
+  const el=document.getElementById('v-dashboard');
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:16px">
+      <h3>${icon('clock')} Today · ${fmtAD(today)}</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:13px;color:var(--muted)">${dayName(today)} · ${bsStr(b)} BS</div>
+          <div style="font-size:14px;margin-top:6px">
+            ${todayRec ? (statusPill(todayRec.status)+' '+payPill(todayRec.pay)) : '<span style="color:var(--muted)">Not logged yet</span>'}
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;padding:12px 20px" onclick="openLog('${todayKey}')">${icon('plus')} Log today</button>
+      </div>
+    </div>
+
+    <div class="stats" style="margin-bottom:16px">
+      <div class="stat"><div class="lbl">${icon('log')} Total log days</div><div class="n">${totalLog}</div><div class="sub">${EN_MONTHS[m-1]} · all statuses</div></div>
+      <div class="stat accent"><div class="lbl">${icon('check')} Present</div><div class="n">${present}</div><div class="sub">this month</div></div>
+      <div class="stat green"><div class="lbl">Paid days</div><div class="n">${paid}</div><div class="sub">this month</div></div>
+      <div class="stat red"><div class="lbl">Unpaid days</div><div class="n">${unpaid}</div><div class="sub">this month</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card"><h3>${icon('calStatus')} Day status split</h3><div class="chart-wrap"><canvas id="ch-status"></canvas></div></div>
+      <div class="card"><h3>${icon('calPay')} Paid vs Unpaid</h3><div class="chart-wrap"><canvas id="ch-pay"></canvas></div></div>
+    </div>
+  `;
+  drawStatusChart('ch-status',recs);
+  drawPayChart('ch-pay',recs);
+}
+
+/* ============================================================
+   2. DAILY LOG  (AD/BS toggle + year + month filters)
+   ============================================================ */
+function renderLog(){
+  const el=document.getElementById('v-log');
+  const sys=CAL.log;
+  // pick a sensible default year/month in this system
+  if(logFilter.sys!==sys){ const t=sysToday(sys); logFilter.sys=sys; logFilter.y=t.y; logFilter.m=t.m; }
+  // years available = from data (converted to this system) + this year
+  const t=sysToday(sys);
+  let years=new Set([t.y]);
+  Object.keys(DB).forEach(k=>{ const s=sysFromAD(sys,new Date(k)); years.add(s.y); });
+  years=[...years].sort();
+  if(!years.includes(logFilter.y)) logFilter.y=t.y;
+  const monthsArr = sys==='bs'?NP_MONTHS:EN_MONTHS;
+  let yearOpts=years.map(yy=>`<option value="${yy}" ${yy===logFilter.y?'selected':''}>${yy}</option>`).join('');
+  let monthOpts=monthsArr.map((nm,i)=>`<option value="${i+1}" ${(i+1)===logFilter.m?'selected':''}>${nm}</option>`).join('');
+  let statusOpts=`<option value="all">All statuses</option>`+Object.keys(STATUS_META).map(s=>`<option value="${s}" ${logFilter.status===s?'selected':''}>${STATUS_META[s].label}</option>`).join('');
+
+  let recs=recordsInMonth(sys,logFilter.y,logFilter.m);
+  if(logFilter.status!=='all') recs=recs.filter(r=>r.status===logFilter.status);
+
+  let rows='';
+  if(recs.length===0){
+    rows=`<tr><td colspan="8"><div class="empty-state">No entries for ${monthLabel(sys,logFilter.y,logFilter.m)}.</div></td></tr>`;
+  } else {
+    recs.forEach(r=>{
+      const ad=new Date(r.key); const b=adToBs(ad);
+      rows+=`<tr>
+        <td class="mono">${ad.getDate()}/${ad.getMonth()+1}/${ad.getFullYear()}</td>
+        <td class="mono">${b.y}-${String(b.m).padStart(2,'0')}-${String(b.d).padStart(2,'0')}</td>
+        <td>${dayName(ad)}</td>
+        <td>${statusPill(r.status)}</td>
+        <td>${payPill(r.pay)}</td>
+        <td style="max-width:160px;color:var(--muted);font-size:12px">${r.desc?escapeHtml(r.desc):'—'}</td>
+        <td><div class="rowact">
+          <button title="Edit" onclick="openLog('${r.key}')">${icon('edit')}</button>
+          <button class="del" title="Delete" onclick="confirmDelete('${r.key}')">${icon('trash')}</button>
+        </div></td>
+      </tr>`;
+    });
+  }
+
+  el.innerHTML=`
+    ${sysToggle('log')}
+    <div class="card" style="margin-bottom:16px">
+      <h3>${icon('log')} Filters · ${sys==='bs'?'Nepali':'English'} calendar</h3>
+      <div class="frow">
+        <div class="fcol"><label>${sys==='bs'?'BS':'AD'} Year</label><select id="fY">${yearOpts}</select></div>
+        <div class="fcol"><label>${sys==='bs'?'BS':'AD'} Month</label><select id="fM">${monthOpts}</select></div>
+        <div class="fcol"><label>Status</label><select id="fS">${statusOpts}</select></div>
+        <button class="btn btn-sm go" id="logAddBtn">${icon('plus')} Log a day</button>
+      </div>
+      <div style="margin-top:13px;font-size:13px;color:var(--muted)">
+        <b style="color:var(--ink)" class="mono">${recs.length}</b> entr${recs.length===1?'y':'ies'} in ${monthLabel(sys,logFilter.y,logFilter.m)}
+      </div>
+    </div>
+    <div class="card">
+      <div class="tablewrap"><table>
+        <thead><tr>
+          <th>AD Date</th><th>BS Date</th><th>Day</th><th>Status</th><th>Pay</th><th>Description</th><th>Action</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+    </div>`;
+  document.getElementById('fY').onchange=e=>{logFilter.y=+e.target.value;renderLog();};
+  document.getElementById('fM').onchange=e=>{logFilter.m=+e.target.value;renderLog();};
+  document.getElementById('fS').onchange=e=>{logFilter.status=e.target.value;renderLog();};
+  document.getElementById('logAddBtn').onclick=()=>openLog(todayKey);
+}
+
+/* ============================================================
+   3. STATUS CALENDAR (AD/BS toggle) + chart + month log
+   ============================================================ */
+function renderStatusCal(){
+  const sys=CAL.status;
+  if(scState.sys!==sys){ const t=sysToday(sys); scState.sys=sys; scState.y=t.y; scState.m=t.m; }
+  const el=document.getElementById('v-statuscal');
+  el.innerHTML=`
+    ${sysToggle('status')}
+    <div class="card">
+      <div class="cal-head">
+        <button class="cal-nav" id="scPrev">${icon('chevL')}</button>
+        <div class="cal-title"><div class="m" id="scMonth"></div><div class="s" id="scSub"></div></div>
+        <button class="cal-nav" id="scNext">${icon('chevR')}</button>
+      </div>
+      <div class="dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+      <div class="days" id="scDays"></div>
+      <div class="legend">
+        <span><i style="background:var(--present)"></i>Present</span>
+        <span><i style="background:var(--holiday)"></i>Holiday</span>
+        <span><i style="background:var(--leave)"></i>Leave</span>
+        <span><i style="background:var(--offday)"></i>Offday</span>
+        <span><i class="dot" style="background:var(--paid)"></i>Paid</span>
+        <span><i class="dot" style="background:var(--unpaid)"></i>Unpaid</span>
+      </div>
+      <div id="scDetail"></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h3 id="scChartTitle"></h3><div class="chart-wrap sm"><canvas id="sc-chart"></canvas></div></div>
+    <div class="section-title">Month-wise log</div>
+    <div class="card" id="scLog"></div>`;
+  document.getElementById('scPrev').onclick=()=>navStatus(-1);
+  document.getElementById('scNext').onclick=()=>navStatus(1);
+  drawStatusGrid();
+  document.getElementById('scLog').innerHTML=monthLogBlock(sys);
+}
+function navStatus(dir){
+  const nx=stepMonth(CAL.status,scState.y,scState.m,dir); if(!nx) return;
+  scState.y=nx.y; scState.m=nx.m; drawStatusGrid();
+}
+function calSub(sys,y,m){
+  // show the "other" system's span as subtitle
+  const f=sysFirstAD(sys,y,m), l=sysDayAD(sys,y,m,sysMonthDays(sys,y,m));
+  if(sys==='bs'){ const o={month:'short',year:'numeric'}; return f.toLocaleDateString('en-GB',o)+(f.getMonth()!==l.getMonth()?' – '+l.toLocaleDateString('en-GB',o):''); }
+  const b1=adToBs(f),b2=adToBs(l); if(b1.m===b2.m) return `${NP_MONTHS[b1.m-1]} ${b1.y} BS`; return `${NP_MONTHS[b1.m-1]}–${NP_MONTHS[b2.m-1]} ${b2.y} BS`;
+}
+function drawStatusGrid(){
+  const sys=CAL.status, y=scState.y, m=scState.m;
+  document.getElementById('scMonth').textContent=monthLabel(sys,y,m);
+  document.getElementById('scSub').textContent=calSub(sys,y,m);
+  document.getElementById('scChartTitle').innerHTML=`${icon('calStatus')} Status breakdown · ${monthLabel(sys,y,m)}`;
+  const wrap=document.getElementById('scDays'); wrap.innerHTML='';
+  const days=sysMonthDays(sys,y,m); const start=sysFirstAD(sys,y,m).getDay();
+  for(let i=0;i<start;i++){ const e=document.createElement('div');e.className='day empty';wrap.appendChild(e); }
+  for(let d=1;d<=days;d++){
+    const ad=sysDayAD(sys,y,m,d); const key=isoKey(ad); const r=DB[key]; const b=adToBs(ad);
+    const big = sys==='bs'? npNum(d) : d;
+    const small = sys==='bs'? ad.getDate() : npNum(b.d);
+    const hol=getHoliday(b.y,b.m,b.d);
+    const el=document.createElement('div'); el.className='day';
+    if(r&&r.status) el.classList.add('f-'+r.status);
+    if(key===todayKey) el.classList.add('today');
+    if(key===scSel) el.classList.add('sel');
+    let inner=`<span class="bn">${big}</span><span class="an">${small}</span>`;
+    if(r&&r.pay) inner+=`<span class="paydot" style="background:var(--${r.pay})"></span>`;
+    if(hol&&!(r&&r.status)) inner+=`<span class="hol"></span>`;
+    el.innerHTML=inner;
+    el.onclick=()=>{ scSel=key; drawStatusGrid(); showStatusDetail(key,ad,hol); };
+    wrap.appendChild(el);
+  }
+  drawStatusChart('sc-chart',recordsInMonth(sys,y,m));
+}
+function showStatusDetail(key,ad,hol){
+  const r=DB[key]||{}; const b=adToBs(ad); const c=document.getElementById('scDetail');
+  c.innerHTML=`<div class="detail">
+    <div class="dh">${fmtAD(ad)}</div>
+    <div class="dsub">${dayName(ad)} · ${NP_MONTHS[b.m-1]} ${b.d}, ${b.y} BS${hol?' · '+hol:''}</div>
+    <div class="drow"><span class="k">Day status</span><span class="v">${statusPill(r.status)}</span></div>
+    <div class="drow"><span class="k">Pay status</span><span class="v">${payPill(r.pay)}</span></div>
+    ${r.desc?`<div class="drow"><span class="k">Note</span><span class="v" style="max-width:60%;text-align:right">${escapeHtml(r.desc)}</span></div>`:''}
+    <div style="margin-top:13px"><button class="btn btn-sm go" onclick="openLog('${key}')">${icon('edit')} Edit this day</button></div>
+  </div>`;
+}
+
+/* ============================================================
+   4. PAY CALENDAR (AD/BS toggle) + range breakdown + chart + log
+   ============================================================ */
+function renderPayCal(){
+  const sys=CAL.pay;
+  if(pcState.sys!==sys){ const t=sysToday(sys); pcState.sys=sys; pcState.y=t.y; pcState.m=t.m; }
+  const el=document.getElementById('v-paycal');
+  el.innerHTML=`
+    ${sysToggle('pay')}
+    <div class="card" style="margin-bottom:16px">
+      <h3>${icon('calPay')} Mark a date range</h3>
+      <div class="frow">
+        <div class="fcol"><label>From (AD)</label><input type="date" id="prFrom"></div>
+        <div class="fcol"><label>To (AD)</label><input type="date" id="prTo"></div>
+      </div>
+      <div class="btnrow" style="margin-top:12px">
+        <button class="btn btn-sm go" onclick="markRange('paid')">Mark Paid</button>
+        <button class="btn btn-sm" onclick="markRange('unpaid')">Mark Unpaid</button>
+        <button class="btn btn-sm" onclick="markRange('clear')">Clear pay</button>
+        <button class="btn btn-sm" onclick="showRangeBreakdown()">Show breakdown</button>
+      </div>
+      <div id="rangeBreak"></div>
+    </div>
+    <div class="card">
+      <div class="cal-head">
+        <button class="cal-nav" id="pcPrev">${icon('chevL')}</button>
+        <div class="cal-title"><div class="m" id="pcMonth"></div><div class="s" id="pcSub"></div></div>
+        <button class="cal-nav" id="pcNext">${icon('chevR')}</button>
+      </div>
+      <div class="dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+      <div class="days" id="pcDays"></div>
+      <div class="legend">
+        <span><i style="background:var(--paid)"></i>Paid</span>
+        <span><i style="background:var(--unpaid)"></i>Unpaid</span>
+        <span><i style="background:var(--bg1);border:1px solid var(--line)"></i>Unset</span>
+      </div>
+      <div id="pcDetail"></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h3 id="pcChartTitle"></h3><div class="chart-wrap sm"><canvas id="pc-chart"></canvas></div></div>
+    <div class="section-title">Month-wise log</div>
+    <div class="card" id="pcLog"></div>`;
+  const f=new Date(today.getFullYear(),today.getMonth(),1);
+  document.getElementById('prFrom').value=isoKey(f);
+  document.getElementById('prTo').value=todayKey;
+  document.getElementById('pcPrev').onclick=()=>navPay(-1);
+  document.getElementById('pcNext').onclick=()=>navPay(1);
+  drawPayGrid();
+  document.getElementById('pcLog').innerHTML=monthLogBlock(sys);
+}
+function navPay(dir){
+  const nx=stepMonth(CAL.pay,pcState.y,pcState.m,dir); if(!nx) return;
+  pcState.y=nx.y; pcState.m=nx.m; drawPayGrid();
+}
+function drawPayGrid(){
+  const sys=CAL.pay, y=pcState.y, m=pcState.m;
+  document.getElementById('pcMonth').textContent=monthLabel(sys,y,m);
+  document.getElementById('pcSub').textContent=calSub(sys,y,m);
+  document.getElementById('pcChartTitle').innerHTML=`${icon('calPay')} Pay breakdown · ${monthLabel(sys,y,m)}`;
+  const wrap=document.getElementById('pcDays'); wrap.innerHTML='';
+  const days=sysMonthDays(sys,y,m); const start=sysFirstAD(sys,y,m).getDay();
+  for(let i=0;i<start;i++){ const e=document.createElement('div');e.className='day empty';wrap.appendChild(e); }
+  for(let d=1;d<=days;d++){
+    const ad=sysDayAD(sys,y,m,d); const key=isoKey(ad); const r=DB[key]; const b=adToBs(ad);
+    const big = sys==='bs'? npNum(d) : d;
+    const small = sys==='bs'? ad.getDate() : npNum(b.d);
+    const el=document.createElement('div'); el.className='day';
+    if(r&&r.pay) el.classList.add('p-'+r.pay);
+    if(key===todayKey) el.classList.add('today');
+    if(key===pcSel) el.classList.add('sel');
+    el.innerHTML=`<span class="bn">${big}</span><span class="an">${small}</span>`;
+    el.onclick=()=>{ pcSel=key; drawPayGrid(); showPayDetail(key,ad); };
+    wrap.appendChild(el);
+  }
+  drawPayChart('pc-chart',recordsInMonth(sys,y,m));
+}
+function showPayDetail(key,ad){
+  const r=DB[key]||{}; const b=adToBs(ad); const c=document.getElementById('pcDetail');
+  c.innerHTML=`<div class="detail">
+    <div class="dh">${fmtAD(ad)}</div>
+    <div class="dsub">${dayName(ad)} · ${NP_MONTHS[b.m-1]} ${b.d}, ${b.y} BS</div>
+    <div class="drow"><span class="k">Pay status</span><span class="v">${payPill(r.pay)}</span></div>
+    <div class="drow"><span class="k">Day status</span><span class="v">${statusPill(r.status)}</span></div>
+    <div class="btnrow" style="margin-top:13px">
+      <button class="btn btn-sm go" onclick="setPaySingle('${key}','paid')">Paid</button>
+      <button class="btn btn-sm" onclick="setPaySingle('${key}','unpaid')">Unpaid</button>
+      <button class="btn btn-sm" onclick="setPaySingle('${key}','clear')">Clear</button>
+    </div>
+  </div>`;
+}
+async function setPaySingle(key,val){
+  setRec(key,{pay: val==='clear'?null:val});
+  if(val==='clear'&&DB[key]) DB[key].pay=null;
+  await upsertDay(key); drawPayGrid();
+  showPayDetail(key,new Date(key));
+  document.getElementById('pcLog').innerHTML=monthLogBlock(CAL.pay);
+  toast(val==='clear'?'Pay cleared':'Marked '+val);
+}
+async function markRange(val){
+  const from=document.getElementById('prFrom').value, to=document.getElementById('prTo').value;
+  if(!from||!to){ toast('Pick both dates'); return; }
+  let a=new Date(from),b=new Date(to); if(a>b)[a,b]=[b,a];
+  const keys=[];
+  for(let d=new Date(a); d<=b; d.setDate(d.getDate()+1)){
+    const key=isoKey(d);
+    if(val==='clear'){ if(DB[key]){ DB[key].pay=null; setRec(key,{}); } }
+    else setRec(key,{pay:val});
+    keys.push(key);
+  }
+  await upsertMany(keys);
+  drawPayGrid();
+  document.getElementById('pcLog').innerHTML=monthLogBlock(CAL.pay);
+  showRangeBreakdown();
+  toast(`${keys.length} day(s) → ${val==='clear'?'cleared':val}`);
+}
+function showRangeBreakdown(){
+  const from=document.getElementById('prFrom').value, to=document.getElementById('prTo').value;
+  const c=document.getElementById('rangeBreak');
+  if(!from||!to){ c.innerHTML=''; return; }
+  let a=new Date(from),b=new Date(to); if(a>b)[a,b]=[b,a];
+  const paid=[],unpaid=[],unset=[];
+  for(let d=new Date(a); d<=b; d.setDate(d.getDate()+1)){
+    const key=isoKey(d); const r=DB[key];
+    if(r&&r.pay==='paid') paid.push(key);
+    else if(r&&r.pay==='unpaid') unpaid.push(key);
+    else unset.push(key);
+  }
+  const per=PROFILE.salary.perPresent, cur=PROFILE.salary.currency;
+  const list=(arr)=>arr.length? arr.map(k=>{const ad=new Date(k);return `<span class="daychip">${ad.getDate()}/${ad.getMonth()+1}</span>`;}).join('') : '<span style="color:var(--muted2)">none</span>';
+  c.innerHTML=`<div class="range-break">
+    <div class="rb-row"><span class="rb-k" style="color:var(--paid)">Paid (${paid.length})</span><span class="rb-v">${list(paid)}</span></div>
+    <div class="rb-row"><span class="rb-k" style="color:var(--unpaid)">Unpaid (${unpaid.length})</span><span class="rb-v">${list(unpaid)}</span></div>
+    <div class="rb-row"><span class="rb-k" style="color:var(--muted)">Unset (${unset.length})</span><span class="rb-v">${list(unset)}</span></div>
+    <div class="rb-foot">Unpaid days earn <b class="mono" style="color:var(--accent)">${cur} ${(unpaid.length*per).toLocaleString()}</b> at ${cur} ${per}/day</div>
+  </div>`;
+}
+
+/* ============================================================
+   5. ANALYTICS (AD/BS toggle) — current month + all-months unpaid
+   ============================================================ */
+function renderAnalytics(){
+  const sys=CAL.ana;
+  const t=sysToday(sys);
+  const monthRecs=recordsInMonth(sys,t.y,t.m);
+  const totalDays=sysMonthDays(sys,t.y,t.m);
+  const logged=monthRecs.length;
+  const present=monthRecs.filter(r=>r.status==='present').length;
+  const holiday=monthRecs.filter(r=>r.status==='holiday').length;
+  const leave=monthRecs.filter(r=>r.status==='leave').length;
+  const offday=monthRecs.filter(r=>r.status==='offday').length;
+  const paidM=monthRecs.filter(r=>r.pay==='paid').length;
+  const unpaidM=monthRecs.filter(r=>r.pay==='unpaid').length;
+  const presentPct=logged?Math.round(present/logged*100):0;
+  const all=allRecordsSorted();
+  const streak=longestPresentStreak(all);
+  const unpaidAll=allUnpaid();
+
+  const el=document.getElementById('v-analytics');
+  el.innerHTML=`
+    ${sysToggle('ana')}
+    <div class="section-title">${monthLabel(sys,t.y,t.m)} — this month</div>
+    <div class="stats" style="margin-bottom:16px">
+      <div class="stat"><div class="lbl">Days in month</div><div class="n">${totalDays}</div><div class="sub">from day 1</div></div>
+      <div class="stat accent"><div class="lbl">Logged days</div><div class="n">${logged}</div><div class="sub">all statuses</div></div>
+      <div class="stat green"><div class="lbl">Present</div><div class="n">${present}</div><div class="sub">${presentPct}% of logged</div></div>
+      <div class="stat red"><div class="lbl">Unpaid</div><div class="n">${unpaidM}</div><div class="sub">this month</div></div>
+    </div>
+    <div class="stats" style="margin-bottom:16px">
+      <div class="stat blue"><div class="lbl">Holiday</div><div class="n">${holiday}</div></div>
+      <div class="stat amber"><div class="lbl">Leave</div><div class="n">${leave}</div></div>
+      <div class="stat"><div class="lbl">Offday</div><div class="n">${offday}</div></div>
+      <div class="stat green"><div class="lbl">Paid</div><div class="n">${paidM}</div></div>
+    </div>
+    <div class="card"><h3>${icon('analytics')} ${monthLabel(sys,t.y,t.m)} status breakdown</h3><div class="chart-wrap"><canvas id="ca-month"></canvas></div></div>
+
+    <div class="section-title">All-time</div>
+    <div class="stats" style="margin-bottom:16px">
+      <div class="stat accent"><div class="lbl">Days logged</div><div class="n">${all.length}</div></div>
+      <div class="stat amber"><div class="lbl">Longest streak</div><div class="n">${streak}</div><div class="sub">present in a row</div></div>
+      <div class="stat red"><div class="lbl">Unpaid total</div><div class="n">${unpaidAll.length}</div><div class="sub">all months</div></div>
+      <div class="stat green"><div class="lbl">Paid total</div><div class="n">${allPaid().length}</div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px"><h3>${icon('clock')} Monthly present days (${sys==='bs'?'BS':'AD'})</h3><div class="chart-wrap"><canvas id="ca-monthly"></canvas></div></div>
+
+    <div class="section-title">Unpaid days — all months</div>
+    <div class="card" id="ca-unpaid"></div>
+  `;
+  destroyChart('ca-month');
+  charts['ca-month']=new Chart(document.getElementById('ca-month'),{type:'bar',
+    data:{labels:['Present','Holiday','Leave','Offday'],datasets:[{label:'Days',data:[present,holiday,leave,offday],
+      backgroundColor:['#34d399','#60a5fa','#fbbf24','#94a3b8'],borderRadius:5}]},options:baseOpts({plugins:{legend:{display:false}}})});
+  drawMonthlyPresent('ca-monthly',sys);
+  document.getElementById('ca-unpaid').innerHTML=unpaidListByMonth(sys);
+}
+function drawMonthlyPresent(id,sys){
+  destroyChart(id);
+  const groups=recordsBySysMonth(sys);
+  const keys=Object.keys(groups).sort();
+  const labels=keys.map(k=>{ const g=groups[k]; return (sys==='bs'?NP_MONTHS:EN_MONTHS)[g.m-1].slice(0,3)+' '+String(g.y).slice(2); });
+  const data=keys.map(k=>groups[k].recs.filter(r=>r.status==='present').length);
+  charts[id]=new Chart(document.getElementById(id),{type:'line',
+    data:{labels,datasets:[{label:'Present days',data,borderColor:'#34d399',
+      backgroundColor:'rgba(52,211,153,.12)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#34d399'}]},
+    options:baseOpts({plugins:{legend:{display:false}}})});
+}
+function unpaidListByMonth(sys){
+  const groups=recordsBySysMonth(sys);
+  const keys=Object.keys(groups).sort().reverse().filter(k=>groups[k].recs.some(r=>r.pay==='unpaid'));
+  if(keys.length===0) return `<div class="empty-state">No unpaid days recorded.</div>`;
+  let html='';
+  keys.forEach(k=>{
+    const g=groups[k]; const arr=g.recs.filter(r=>r.pay==='unpaid').sort((a,b)=>a.key<b.key?-1:1);
+    let rows='';
+    arr.forEach(r=>{ const ad=new Date(r.key); const b=adToBs(ad);
+      rows+=`<tr><td class="mono">${fmtAD(ad)}</td><td class="mono">${b.y}-${String(b.m).padStart(2,'0')}-${String(b.d).padStart(2,'0')}</td><td>${dayName(ad)}</td><td>${statusPill(r.status)}</td></tr>`; });
+    html+=`<div class="month-group"><div class="month-group-head"><span class="mg-title">${monthLabel(sys,g.y,g.m)}</span><span class="mg-meta" style="color:var(--unpaid)">${arr.length} unpaid</span></div>
+      <div class="tablewrap"><table><thead><tr><th>AD Date</th><th>BS Date</th><th>Day</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  });
+  return html;
+}
+
+/* ============================================================
+   7. SALARY (current AD month + month-wise + all-time + unpaid)
+   ============================================================ */
+function renderSalary(){
+  const y=today.getFullYear(), m=today.getMonth()+1;
+  const sal=salaryForAdMonth(y,m);
+  const recs=recordsInAdMonth(y,m);
+  const paidDays=recs.filter(r=>r.pay==='paid');
+  const unpaidDays=recs.filter(r=>r.pay==='unpaid');
+  const cur=PROFILE.salary.currency;
+
+  // month-wise pay counts across all AD months
+  const groups=recordsBySysMonth('ad');
+  const mkeys=Object.keys(groups).sort().reverse();
+  let monthRows='';
+  let totalPaidAll=0,totalUnpaidAll=0;
+  mkeys.forEach(mk=>{
+    const arr=groups[mk].recs;
+    const p=arr.filter(r=>r.pay==='paid').length;
+    const u=arr.filter(r=>r.pay==='unpaid').length;
+    totalPaidAll+=p; totalUnpaidAll+=u;
+    monthRows+=`<tr><td>${monthLabel('ad',groups[mk].y,groups[mk].m)}</td><td class="mono" style="color:var(--paid)">${p}</td><td class="mono" style="color:var(--unpaid)">${u}</td></tr>`;
+  });
+
+  const el=document.getElementById('v-salary');
+  el.innerHTML=`
+    <div class="salary-hero">
+      <div class="lbl">Salary this month · ${EN_MONTHS[m-1]} ${y}</div>
+      <div class="amt mono">${cur} ${sal.total.toLocaleString()}</div>
+      <div class="break">${cur} ${sal.base.toLocaleString()} base + ${sal.payable} payable day${sal.payable===1?'':'s'} × ${cur} ${sal.per}</div>
+    </div>
+
+    <div class="section-title">Current month breakdown</div>
+    <div class="grid2">
+      <div class="card">
+        <h3>${icon('salary')} ${EN_MONTHS[m-1]} breakdown</h3>
+        <div class="mini-stat"><span>Base salary</span><span class="v mono">${cur} ${sal.base.toLocaleString()}</span></div>
+        <div class="mini-stat"><span>Present days</span><span class="v mono">${sal.present}</span></div>
+        <div class="mini-stat"><span>Unpaid days</span><span class="v mono">${sal.unpaid}</span></div>
+        <div class="mini-stat"><span>Payable days (present + unpaid)</span><span class="v mono">${sal.payable}</span></div>
+        <div class="mini-stat"><span>Per-day rate</span><span class="v mono">${cur} ${sal.per}</span></div>
+        <div class="mini-stat"><span>Day earnings</span><span class="v mono">${cur} ${(sal.payable*sal.per).toLocaleString()}</span></div>
+        <div class="mini-stat" style="border-top:2px solid var(--line2);margin-top:4px;padding-top:11px">
+          <span style="font-weight:700">Total</span><span class="v mono" style="color:var(--accent);font-size:16px">${cur} ${sal.total.toLocaleString()}</span></div>
+      </div>
+      <div class="card">
+        <h3>${icon('calPay')} ${EN_MONTHS[m-1]} pay counts</h3>
+        <div class="mini-stat"><span><span class="pill" style="background:var(--paid)22;color:var(--paid)"><i style="background:var(--paid)"></i>Paid days</span></span><span class="v mono">${paidDays.length}</span></div>
+        <div class="mini-stat"><span><span class="pill" style="background:var(--unpaid)22;color:var(--unpaid)"><i style="background:var(--unpaid)"></i>Unpaid days</span></span><span class="v mono">${unpaidDays.length}</span></div>
+        <div class="mini-stat"><span>Present days</span><span class="v mono">${sal.present}</span></div>
+      </div>
+    </div>
+
+    <div class="section-title">Pay-day counts — all months (AD)</div>
+    <div class="card">
+      <div class="tablewrap"><table>
+        <thead><tr><th>Month (AD)</th><th>Paid</th><th>Unpaid</th></tr></thead>
+        <tbody>${monthRows||'<tr><td colspan=3><div class="empty-state">No data yet.</div></td></tr>'}</tbody>
+        <tfoot><tr style="border-top:2px solid var(--line2)"><td style="font-weight:700;padding:11px 12px">Total</td><td class="mono" style="color:var(--paid);font-weight:700;padding:11px 12px">${totalPaidAll}</td><td class="mono" style="color:var(--unpaid);font-weight:700;padding:11px 12px">${totalUnpaidAll}</td></tr></tfoot>
+      </table></div>
+    </div>
+
+    <div class="section-title">All unpaid days (every month)</div>
+    <div class="card" id="sal-unpaid"></div>
+  `;
+  document.getElementById('sal-unpaid').innerHTML=unpaidListByMonth('ad');
+}
+
+
+/* ============================================================
+   6. HOLIDAYS (unchanged logic)
+   ============================================================ */
+function getHoliday(y,m,d){ const h=HOLIDAYS_BS.find(h=>h.y===y&&h.m===m&&h.d===d); return h?h.name:null; }
+function renderHolidays(){
+  const el=document.getElementById('v-holidays');
+  const todayCmp=todayKey;
+  const years=[...new Set(HOLIDAYS_BS.map(h=>h.y))].sort();
+  let html='';
+  years.forEach(yr=>{
+    html+=`<div class="section-title">${yr} BS</div><div class="card">`;
+    HOLIDAYS_BS.filter(h=>h.y===yr).sort((a,b)=>a.m-b.m||a.d-b.d).forEach(h=>{
+      const ad=bsToAd(h.y,h.m,h.d); const past=isoKey(ad)<todayCmp;
+      html+=`<div class="hol-item ${past?'hol-past':''}">
+        <div class="hol-date"><div class="d mono">${ad.getDate()}</div><div class="mo">${EN_MONTHS[ad.getMonth()].slice(0,3)}</div></div>
+        <div class="hol-info"><div class="nm">${h.name}</div><div class="ad">${dayName(ad)} · ${NP_MONTHS[h.m-1]} ${h.d}, ${h.y} BS</div></div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  el.innerHTML=`<div class="card" style="margin-bottom:16px;background:var(--bg1)">
+    <div style="font-size:12.5px;color:var(--muted);line-height:1.6">Major Nepali public holidays with AD and BS dates. Festival dates shift yearly with the lunar calendar — verify and edit the HOLIDAYS_BS list if needed.</div>
+  </div>${html}`;
+}
+
+/* ============================================================
+   7. SALARY — current AD month + month-wise counts + all-time + unpaid list
+   ============================================================ */
+function renderSalary(){
+  const y=today.getFullYear(), m=today.getMonth()+1;
+  const sal=salaryForAdMonth(y,m);
+  const recs=recordsInAdMonth(y,m);
+  const paidDays=recs.filter(r=>r.pay==='paid');
+  const unpaidDays=recs.filter(r=>r.pay==='unpaid');
+  const cur=PROFILE.salary.currency;
+  const paidPresent=paidDays.filter(r=>r.status==='present').length;
+
+  // month-wise pay counts (all months)
+  const groups=recordsByAdMonth();
+  const mkeys=Object.keys(groups).sort().reverse();
+  let monthRows='';
+  let totalPaidAll=0,totalUnpaidAll=0;
+  mkeys.forEach(mk=>{
+    const arr=groups[mk];
+    const p=arr.filter(r=>r.pay==='paid').length;
+    const u=arr.filter(r=>r.pay==='unpaid').length;
+    totalPaidAll+=p; totalUnpaidAll+=u;
+    monthRows+=`<tr><td>${adMonthLabel(mk)}</td><td class="mono" style="color:var(--paid)">${p}</td><td class="mono" style="color:var(--unpaid)">${u}</td></tr>`;
+  });
+
+  const el=document.getElementById('v-salary');
+  el.innerHTML=`
+    <div class="salary-hero">
+      <div class="lbl">Salary this month · ${EN_MONTHS[m-1]} ${y}</div>
+      <div class="amt mono">${cur} ${sal.total.toLocaleString()}</div>
+      <div class="break">${cur} ${sal.base.toLocaleString()} base + ${sal.present} present × ${cur} ${sal.per}</div>
+    </div>
+
+    <div class="section-title">Current month breakdown</div>
+    <div class="grid2">
+      <div class="card">
+        <h3>${icon('salary')} ${EN_MONTHS[m-1]} breakdown</h3>
+        <div class="mini-stat"><span>Base salary</span><span class="v mono">${cur} ${sal.base.toLocaleString()}</span></div>
+        <div class="mini-stat"><span>Present days</span><span class="v mono">${sal.present}</span></div>
+        <div class="mini-stat"><span>Per-day rate</span><span class="v mono">${cur} ${sal.per}</span></div>
+        <div class="mini-stat"><span>Present earnings</span><span class="v mono">${cur} ${(sal.present*sal.per).toLocaleString()}</span></div>
+        <div class="mini-stat" style="border-top:2px solid var(--line2);margin-top:4px;padding-top:11px">
+          <span style="font-weight:700">Total</span><span class="v mono" style="color:var(--accent);font-size:16px">${cur} ${sal.total.toLocaleString()}</span></div>
+      </div>
+      <div class="card">
+        <h3>${icon('calPay')} ${EN_MONTHS[m-1]} pay counts</h3>
+        <div class="mini-stat"><span><span class="pill" style="background:var(--paid)22;color:var(--paid)"><i style="background:var(--paid)"></i>Paid days</span></span><span class="v mono">${paidDays.length}</span></div>
+        <div class="mini-stat"><span><span class="pill" style="background:var(--unpaid)22;color:var(--unpaid)"><i style="background:var(--unpaid)"></i>Unpaid days</span></span><span class="v mono">${unpaidDays.length}</span></div>
+        <div class="mini-stat"><span>Paid &amp; present</span><span class="v mono">${paidPresent}</span></div>
+      </div>
+    </div>
+
+    <div class="section-title">Pay-day counts — all months</div>
+    <div class="card">
+      <div class="tablewrap"><table>
+        <thead><tr><th>Month (AD)</th><th>Paid</th><th>Unpaid</th></tr></thead>
+        <tbody>${monthRows||'<tr><td colspan=3><div class="empty-state">No data yet.</div></td></tr>'}</tbody>
+        <tfoot><tr style="border-top:2px solid var(--line2)"><td style="font-weight:700;padding:11px 12px">Total</td><td class="mono" style="color:var(--paid);font-weight:700;padding:11px 12px">${totalPaidAll}</td><td class="mono" style="color:var(--unpaid);font-weight:700;padding:11px 12px">${totalUnpaidAll}</td></tr></tfoot>
+      </table></div>
+    </div>
+
+    <div class="section-title">All unpaid days (every month)</div>
+    <div class="card" id="sal-unpaid"></div>
+  `;
+  document.getElementById('sal-unpaid').innerHTML=unpaidListByMonth();
+}
+/* ===== LOG / EDIT MODAL ===== */
+function openLog(key){
+  editKey=key;
+  const ad=new Date(key); const b=adToBs(ad); const r=DB[key]||{};
+  document.getElementById('lmTitle').textContent=DB[key]?'Edit day':'Log a day';
+  document.getElementById('lmSub').textContent=`${fmtAD(ad)} · ${dayName(ad)} · ${bsStr(b)} BS`;
+  document.getElementById('lmDate').value=key;
+  lmStatusVal=r.status||null; lmPayVal=r.pay||null;
+  const sc=document.getElementById('lmStatus'); sc.innerHTML='';
+  Object.keys(STATUS_META).forEach(s=>{ const m=STATUS_META[s]; const btn=document.createElement('button'); btn.className='segbtn'+(lmStatusVal===s?' on':''); btn.dataset.s=s; btn.style.cssText=lmStatusVal===s?`border-color:${m.color};background:${m.soft};color:${m.color}`:''; btn.innerHTML=`<i style="background:${m.color}"></i>${m.label}`; btn.onclick=()=>{ lmStatusVal=(lmStatusVal===s?null:s); refreshSegs(); }; sc.appendChild(btn); });
+  const pc=document.getElementById('lmPay'); pc.innerHTML='';
+  Object.keys(PAY_META).forEach(p=>{ const m=PAY_META[p]; const btn=document.createElement('button'); btn.className='segbtn'+(lmPayVal===p?' on':''); btn.dataset.p=p; btn.style.cssText=lmPayVal===p?`border-color:${m.color};background:${m.color}22;color:${m.color}`:''; btn.innerHTML=`<i style="background:${m.color}"></i>${m.label}`; btn.onclick=()=>{ lmPayVal=(lmPayVal===p?null:p); refreshSegs(); }; pc.appendChild(btn); });
+  document.getElementById('lmDesc').value=r.desc||'';
+  document.getElementById('logModal').classList.add('show');
+}
+function refreshSegs(){
+  document.querySelectorAll('#lmStatus .segbtn').forEach(btn=>{ const s=btn.dataset.s,m=STATUS_META[s],on=lmStatusVal===s; btn.className='segbtn'+(on?' on':''); btn.style.cssText=on?`border-color:${m.color};background:${m.soft};color:${m.color}`:''; });
+  document.querySelectorAll('#lmPay .segbtn').forEach(btn=>{ const p=btn.dataset.p,m=PAY_META[p],on=lmPayVal===p; btn.className='segbtn'+(on?' on':''); btn.style.cssText=on?`border-color:${m.color};background:${m.color}22;color:${m.color}`:''; });
+}
+function closeLog(){ document.getElementById('logModal').classList.remove('show'); }
+async function saveLog(){
+  const newKey=document.getElementById('lmDate').value;
+  if(!newKey){ toast('Pick a date'); return; }
+  if(newKey!==editKey && DB[editKey]){ delete DB[editKey]; }
+  const desc=document.getElementById('lmDesc').value.trim();
+  setRec(newKey,{status:lmStatusVal,pay:lmPayVal,inT:null,outT:null,desc:desc||null});
+  if(newKey!==editKey) await upsertDay(editKey);
+  await upsertDay(newKey);
+  closeLog(); refreshCurrent(); toast('Saved');
+}
+
+/* ===== EXPORT / IMPORT ===== */
+function exportCSV(){
+  const keys=Object.keys(DB).sort();
+  let csv='AD Date,BS Date,Day,Status,Pay,In,Out,Hours,Description\n';
+  keys.forEach(k=>{ const r=DB[k]; const ad=new Date(k); const b=adToBs(ad); const desc=(r.desc||'').replace(/"/g,'""'); csv+=`${k},${b.y}-${String(b.m).padStart(2,'0')}-${String(b.d).padStart(2,'0')},${dayName(ad)},${r.status||''},${r.pay||''},${r.inT||''},${r.outT||''},${hoursStr(r.inT,r.outT)},"${desc}"\n`; });
+  download('office-log-'+todayKey+'.csv',csv,'text/csv'); toast('CSV exported');
+}
+function exportJSON(){ download('office-log-backup-'+todayKey+'.json',JSON.stringify({records:DB,profile:PROFILE},null,2),'application/json'); toast('Backup downloaded'); }
+function importJSON(e){ const f=e.target.files[0]; if(!f)return; const rd=new FileReader(); rd.onload=async()=>{ try{ const obj=JSON.parse(rd.result); if(obj.records){ DB=obj.records; cacheLocal(); if(sb)await upsertMany(Object.keys(DB)); } if(obj.profile){ PROFILE=obj.profile; saveProfile(); } toast('Backup restored'); refreshCurrent(); }catch(err){ toast('Invalid backup file'); } }; rd.readAsText(f); }
+function download(name,content,type){ const blob=new Blob([content],{type}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); }
+
+/* ===== SETTINGS ===== */
+function renderSettings(){
+  const el=document.getElementById('v-settings');
+  const s=PROFILE.salary, r=PROFILE.reminders;
+  const initials=(PROFILE.name||'R').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  el.innerHTML=`
+    <div class="card">
+      <h3>${icon('user')} Profile</h3>
+      <div class="profile-head"><div class="avatar">${initials}</div>
+        <div><div style="font-size:17px;font-weight:700">${escapeHtml(PROFILE.name)}</div><div style="font-size:12.5px;color:var(--muted)">${escapeHtml(PROFILE.role||'')}</div></div></div>
+      <div class="frow" style="margin-top:8px">
+        <div class="fcol"><label>Name</label><input id="setName" value="${escapeHtml(PROFILE.name)}"></div>
+        <div class="fcol"><label>Role</label><input id="setRole" value="${escapeHtml(PROFILE.role||'')}"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>${icon('salary')} Salary configuration</h3>
+      <div class="set-row"><div class="info"><div class="t">Base salary (monthly)</div><div class="d">Fixed amount every month</div></div><div class="ctl"><input type="number" id="setBase" value="${s.base}"></div></div>
+      <div class="set-row"><div class="info"><div class="t">Per present-day rate</div><div class="d">Added per Present day</div></div><div class="ctl"><input type="number" id="setPer" value="${s.perPresent}"></div></div>
+      <div class="set-row"><div class="info"><div class="t">Currency symbol</div><div class="d">Shown before amounts</div></div><div class="ctl"><input id="setCur" value="${s.currency}"></div></div>
+    </div>
+    <div class="card">
+      <h3>${icon('bell')} Reminders</h3>
+      <div class="set-row"><div class="info"><div class="t">Enable notifications</div><div class="d">Fire while app is open or installed</div></div><div class="ctl"><div class="switch ${r.enabled?'on':''}" id="setNotif"></div></div></div>
+      <div class="set-row"><div class="info"><div class="t">Log-in reminder</div><div class="d">Daily prompt to log in</div></div><div class="ctl"><input type="time" id="setInTime" value="${r.in}"></div></div>
+      <div class="set-row"><div class="info"><div class="t">Log-out reminder</div><div class="d">Daily prompt to log out</div></div><div class="ctl"><input type="time" id="setOutTime" value="${r.out}"></div></div>
+    </div>
+    <div class="card">
+      <h3>${icon('download')} Data</h3>
+      <div class="btnrow">
+        <button class="btn btn-sm" onclick="exportCSV()">${icon('download')} Export CSV</button>
+        <button class="btn btn-sm" onclick="exportJSON()">${icon('download')} Backup (JSON)</button>
+        <button class="btn btn-sm" onclick="document.getElementById('importFile').click()">${icon('upload')} Restore backup</button>
+        <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importJSON(event)">
+      </div>
+    </div>
+    <div class="card"><button class="btn btn-primary" id="setSaveBtn">${icon('check')} Save settings</button></div>
+  `;
+  document.getElementById('setNotif').onclick=function(){ this.classList.toggle('on'); };
+  document.getElementById('setSaveBtn').onclick=saveSettings;
+}
+async function saveSettings(){
+  PROFILE.name=document.getElementById('setName').value.trim()||'User';
+  PROFILE.role=document.getElementById('setRole').value.trim();
+  PROFILE.salary.base=+document.getElementById('setBase').value||0;
+  PROFILE.salary.perPresent=+document.getElementById('setPer').value||0;
+  PROFILE.salary.currency=document.getElementById('setCur').value.trim()||'Rs';
+  PROFILE.reminders.in=document.getElementById('setInTime').value;
+  PROFILE.reminders.out=document.getElementById('setOutTime').value;
+  const wantNotif=document.getElementById('setNotif').classList.contains('on');
+  PROFILE.reminders.enabled=wantNotif;
+  saveProfile();
+  document.getElementById('barName').textContent=PROFILE.name;
+  if(wantNotif && 'Notification' in window && Notification.permission!=='granted'){ const perm=await Notification.requestPermission(); if(perm!=='granted'){ PROFILE.reminders.enabled=false; saveProfile(); toast('Allow notifications in your browser'); } }
+  setupNotifications(); toast('Settings saved');
+}
+
+/* ===== NOTIFICATIONS ===== */
+let notifTimers=[];
+function setupNotifications(){ notifTimers.forEach(t=>clearTimeout(t)); notifTimers=[]; if(!PROFILE.reminders.enabled)return; if(!('Notification' in window)||Notification.permission!=='granted')return; scheduleDaily(PROFILE.reminders.in,'Time to log in','Open Office Log and record your log-in.'); scheduleDaily(PROFILE.reminders.out,'Time to log out','Open Office Log and record your log-out.'); }
+function scheduleDaily(hm,title,body){ if(!hm)return; const [h,m]=hm.split(':').map(Number); const now=new Date(); const t=new Date(now.getFullYear(),now.getMonth(),now.getDate(),h,m,0); if(t<=now)t.setDate(t.getDate()+1); const id=setTimeout(()=>{ fireNotification(title,body); scheduleDaily(hm,title,body); },t-now); notifTimers.push(id); }
+function fireNotification(title,body){ try{ if(navigator.serviceWorker&&navigator.serviceWorker.ready){ navigator.serviceWorker.ready.then(reg=>reg.showNotification(title,{body,icon:'icon-192.png',badge:'icon-192.png',tag:'officelog'})); } else { new Notification(title,{body,icon:'icon-192.png'}); } }catch(e){} }
+
+/* ===== SW + helpers ===== */
+function registerSW(){ if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+function refreshCurrent(){ const R={dashboard:renderDashboard,log:renderLog,statuscal:renderStatusCal,paycal:renderPayCal,analytics:renderAnalytics,holidays:renderHolidays,salary:renderSalary,settings:renderSettings}; R[currentTab](); }
+let toastTimer;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2400); }
+
+
+</script>
+</body>
+</html>
